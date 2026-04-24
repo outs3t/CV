@@ -10,6 +10,20 @@ const PORT = Number(process.env.PORT) > 0 ? Number(process.env.PORT) : 5173;
 const app = express();
 app.use(express.json({ limit: '10mb' }));
 
+function isLocalRequest(req) {
+  const ip = String(req.ip || '');
+  return ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1';
+}
+
+function prankAdminPage(req, res) {
+  res.status(200).send(`<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Admin</title><style>body{margin:0;display:grid;place-items:center;min-height:100vh;background:#0c0c0c;color:#f0ece4;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial} .box{max-width:720px;padding:28px;border:1px solid rgba(255,255,255,0.12);border-radius:18px;background:rgba(255,255,255,0.03)} h1{margin:0 0 10px;font-size:22px} p{margin:0 0 14px;color:#8a8580;line-height:1.5} a{color:#c8a55c;text-decoration:none}</style></head><body><div class="box"><h1>Area Admin</h1><p>Accesso non disponibile.</p><p>Se volevi vedere il CV, vai qui: <a href="/cv">/cv</a></p></div></body></html>`);
+}
+
+function blockNonLocalApi(req, res, next) {
+  if (isLocalRequest(req)) return next();
+  res.status(404).json({ ok: false, error: 'Not found' });
+}
+
 function safeProjectId(id) {
   const s = String(id || '').trim();
   if (!/^[a-z0-9-]+$/i.test(s)) return null;
@@ -507,6 +521,7 @@ const upload = multer({
 });
 
 app.get('/', (req, res) => {
+  if (!isLocalRequest(req)) return prankAdminPage(req, res);
   res.sendFile(path.join(ROOT, 'admin.html'));
 });
 
@@ -515,6 +530,9 @@ app.get('/cv', (req, res) => {
 });
 
 app.use('/assets', express.static(path.join(ROOT, 'assets')));
+
+// Allow API calls only from localhost
+app.use('/api', blockNonLocalApi);
 
 app.post('/api/save-article', (req, res) => {
   try {
