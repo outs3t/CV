@@ -4,6 +4,28 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CV Admin (locale)</title>
+  <script>
+    (function(){
+      var h = String(location.hostname || '');
+      var isLocal = (h === 'localhost' || h === '127.0.0.1' || h === '::1');
+      if (isLocal) return;
+
+      var cvHref = 'Curriculum.html';
+      document.open();
+      document.write('<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Admin</title>' +
+        '<style>:root{--fg:#f0ece4;--muted:#9a948e;--accent:#c8a55c;--bg:#070707;}html,body{height:100%;}body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;overflow:hidden;}#bg{position:fixed;inset:0;width:100%;height:100%;display:block;}.vignette{position:fixed;inset:0;pointer-events:none;background:radial-gradient(1200px 800px at 50% 40%, rgba(0,0,0,0) 0%, rgba(0,0,0,0.35) 55%, rgba(0,0,0,0.75) 100%);} .topGlow{position:fixed;inset:-40% -20% auto -20%;height:70%;background:conic-gradient(from 180deg at 50% 50%, rgba(200,165,92,0.18), rgba(92,184,138,0.12), rgba(138,180,248,0.10), rgba(200,165,92,0.18));filter:blur(30px);opacity:0.9;mix-blend-mode:screen;}.wrap{position:fixed;inset:0;display:grid;place-items:center;padding:28px;}.card{width:min(920px, 92vw);border:1px solid rgba(255,255,255,0.12);border-radius:22px;background:rgba(15,15,15,0.55);backdrop-filter:blur(10px);box-shadow:0 24px 90px rgba(0,0,0,0.55);padding:22px;}.badge{display:inline-flex;align-items:center;gap:10px;padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.03);color:var(--muted);font-size:12px;font-weight:700;letter-spacing:0.02em;}h1{margin:14px 0 10px;font-size:28px;letter-spacing:-0.02em;}p{margin:0 0 16px;color:var(--muted);line-height:1.55;}.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:14px;}a.btn{display:inline-flex;align-items:center;gap:10px;padding:10px 14px;border-radius:999px;border:1px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.06);color:var(--fg);text-decoration:none;font-weight:800;}a.btn.primary{background:rgba(200,165,92,0.18);border-color:rgba(200,165,92,0.32);}.tiny{font-size:12px;color:rgba(240,236,228,0.55);margin-top:14px;}.glitch{position:relative;display:inline-block;}.glitch::before,.glitch::after{content:attr(data-text);position:absolute;left:0;top:0;opacity:0.75;}.glitch::before{transform:translate(1px,0);color:rgba(138,180,248,0.95);clip-path:polygon(0 0,100% 0,100% 38%,0 38%);}.glitch::after{transform:translate(-1px,0);color:rgba(92,184,138,0.95);clip-path:polygon(0 62%,100% 62%,100% 100%,0 100%);}@media (prefers-reduced-motion: reduce){.glitch::before,.glitch::after{display:none;}}</style></head><body>' +
+        '<canvas id="bg"></canvas><div class="topGlow"></div><div class="vignette"></div><div class="wrap"><div class="card" role="dialog" aria-label="Area admin">' +
+        '<span class="badge">Area Admin</span><h1 class="glitch" data-text="Nice try.">Nice try.</h1>' +
+        '<p>Questa pagina è disponibile solo in <strong>locale</strong>.</p>' +
+        '<p>Se cercavi il CV pubblico, lo trovi qui:</p>' +
+        '<div class="row"><a class="btn primary" href="' + cvHref + '">Apri CV</a><a class="btn" href="./">Home</a></div>' +
+        '<div class="tiny">Suggerimento: l’admin gira su <code style="color:rgba(240,236,228,0.85)">localhost</code>.</div>' +
+        '</div></div>' +
+        '<script>(function(){const c=document.getElementById("bg");const ctx=c.getContext("2d");const DPR=Math.min(2,window.devicePixelRatio||1);let w=0,h=0,cols=0,drops=[];const glyphs="01 NICOLA CV ADMIN ACCESS DENIED ".split("");function resize(){w=Math.floor(window.innerWidth);h=Math.floor(window.innerHeight);c.width=Math.floor(w*DPR);c.height=Math.floor(h*DPR);c.style.width=w+"px";c.style.height=h+"px";ctx.setTransform(DPR,0,0,DPR,0,0);cols=Math.floor(w/16);drops=new Array(cols).fill(0).map(()=>Math.random()*h);}function step(){ctx.fillStyle="rgba(7,7,7,0.15)";ctx.fillRect(0,0,w,h);ctx.font="14px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \\\"Liberation Mono\\\", \\\"Courier New\\\", monospace";for(let i=0;i<cols;i++){const x=i*16;const y=drops[i];const ch=glyphs[(Math.random()*glyphs.length)|0];const alpha=0.25+Math.random()*0.6;ctx.fillStyle="rgba(200,165,92,"+alpha+")";ctx.fillText(ch,x,y);drops[i]=y+16+Math.random()*10;if(drops[i]>h+50&&Math.random()>0.975)drops[i]=-Math.random()*200;}requestAnimationFrame(step);}window.addEventListener("resize",resize,{passive:true});resize();step();})();<\/script>' +
+        '</body></html>');
+      document.close();
+    })();
+  </script>
   <style>
     :root{--bg:#0c0c0c;--card:#181818;--border:#252525;--fg:#f0ece4;--muted:#8a8580;--accent:#c8a55c;}
     body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--fg);}
