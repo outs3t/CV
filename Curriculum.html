@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Curriculum — Nicola De Cristofaro</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    :root{--bg:#0c0c0c;--card:#181818;--border:#252525;--fg:#f0ece4;--fg-muted:#8a8580;--accent:#c8a55c;--accent-dim:rgba(200,165,92,0.10);--accent-glow:rgba(200,165,92,0.25);--warm:#e8a060;--fiber:#00d4aa;--fiber-dim:rgba(0,212,170,0.10);--success:#5cb88a;}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--fg);min-height:100vh;overflow-x:hidden;}
+    h1,h2,h3,h4{font-family:'Playfair Display',serif;}
+    .bg-mesh{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+    .bg-mesh .blob{position:absolute;border-radius:50%;filter:blur(130px);opacity:0.3;animation:blobFloat 20s ease-in-out infinite alternate;}
+    .blob-1{width:500px;height:500px;background:radial-gradient(circle,var(--accent-glow),transparent 70%);top:-10%;left:-8%;}
+    .blob-2{width:420px;height:420px;background:radial-gradient(circle,rgba(0,212,170,0.12),transparent 70%);bottom:-8%;right:-6%;animation-delay:-7s!important;}
+    .blob-3{width:300px;height:300px;background:radial-gradient(circle,rgba(232,160,96,0.08),transparent 70%);top:45%;right:15%;animation-delay:-13s!important;}
+    @keyframes blobFloat{0%{transform:translate(0,0) scale(1)}33%{transform:translate(40px,-30px) scale(1.08)}66%{transform:translate(-25px,20px) scale(0.95)}100%{transform:translate(30px,-10px) scale(1.04)}}
+    .grain{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:0.03;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-repeat:repeat;background-size:200px 200px;}
+    .top-nav{position:fixed;top:0;left:0;right:0;z-index:100;backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);background:rgba(12,12,12,0.78);border-bottom:1px solid var(--border);}
+    .nav-pill{position:relative;padding:10px 28px;border-radius:100px;font-weight:600;font-size:0.9rem;letter-spacing:0.02em;cursor:pointer;transition:all 0.35s cubic-bezier(0.4,0,0.2,1);color:var(--fg-muted);border:1px solid transparent;user-select:none;background:none;}
+    .nav-pill:hover{color:var(--fg);}
+    .nav-pill.active{color:var(--bg);background:var(--accent);border-color:var(--accent);box-shadow:0 4px 20px var(--accent-glow);}
+    .page{display:none;opacity:0;transform:translateY(16px);transition:opacity 0.5s ease,transform 0.5s ease;}
+    .page.visible{display:block;}
+    .page.show{opacity:1;transform:translateY(0);}
+    .hero-cv{position:relative;padding:140px 0 60px;}
+    .hero-header-row{display:flex;align-items:center;gap:32px;flex-wrap:nowrap;}
+    .hero-header-text{min-width:0;flex:1;}
+    .hero-name{font-size:clamp(2.6rem,5.5vw,4.6rem);font-weight:900;line-height:1.05;letter-spacing:-0.02em;}
+    .hero-name .accent{color:var(--accent);}
+    .hero-role{font-size:clamp(0.95rem,1.8vw,1.2rem);color:var(--fg-muted);font-weight:300;margin-top:12px;letter-spacing:0.04em;}
+    .hero-role .hero-role-icon{display:inline-flex;align-items:center;justify-content:center;margin-right:10px;opacity:0.95;}
+    .hero-role .hero-role-icon i{font-size:0.92em;}
+    .hero-header-row .profile-img-wrap{transform:translateY(-6px);}
+    .hero-line{width:60px;height:3px;background:var(--accent);border-radius:2px;margin-top:24px;}
+    .cv-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:32px;transition:border-color 0.3s ease,box-shadow 0.3s ease;}
+    .cv-card:hover{border-color:rgba(200,165,92,0.25);box-shadow:0 8px 40px rgba(0,0,0,0.3);}
+    .section-title{font-size:1.3rem;font-weight:700;margin-bottom:24px;display:flex;align-items:center;gap:12px;}
+    .section-title .icon-circle{width:36px;height:36px;border-radius:10px;background:var(--accent-dim);display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:0.85rem;flex-shrink:0;}
+    .section-title .icon-circle.fiber-icon{background:var(--fiber-dim);color:var(--fiber);}
+    .timeline-item{position:relative;padding-left:28px;padding-bottom:36px;border-left:2px solid var(--border);}
+    .timeline-item:last-child{padding-bottom:0;}
+    .timeline-item::before{content:'';position:absolute;left:-6px;top:6px;width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px var(--accent-glow);}
+    .timeline-item.fiber-item::before{background:var(--fiber);box-shadow:0 0 12px rgba(0,212,170,0.3);}
+    .timeline-item .t-date{font-size:0.76rem;color:var(--accent);font-weight:600;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:4px;}
+    .timeline-item.fiber-item .t-date{color:var(--fiber);}
+    .timeline-item .t-role{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;}
+    .timeline-item .t-company{font-size:0.88rem;color:var(--fg-muted);margin-bottom:10px;}
+    .timeline-item .t-desc{font-size:0.86rem;color:var(--fg-muted);line-height:1.7;}
+    .timeline-item .t-desc li{margin-bottom:4px;padding-left:4px;}
+    .tag{display:inline-block;padding:5px 14px;font-size:0.78rem;font-weight:500;border-radius:100px;background:var(--accent-dim);color:var(--accent);border:1px solid rgba(200,165,92,0.12);transition:all 0.25s ease;}
+    .tag:hover{background:rgba(200,165,92,0.18);border-color:rgba(200,165,92,0.35);}
+    .tag.fiber-tag{background:var(--fiber-dim);color:var(--fiber);border-color:rgba(0,212,170,0.12);}
+    .tag.fiber-tag:hover{background:rgba(0,212,170,0.18);border-color:rgba(0,212,170,0.35);}
+    .skill-category{margin-bottom:22px;}.skill-category:last-child{margin-bottom:0;}
+    .skill-cat-title{font-size:0.82rem;font-weight:600;color:var(--fg);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+    .skill-cat-title i{font-size:0.75rem;color:var(--accent);}
+    .skill-items{display:flex;flex-wrap:wrap;gap:6px;}
+    .contact-link{display:flex;align-items:center;gap:12px;padding:10px 0;color:var(--fg-muted);font-size:0.88rem;text-decoration:none;transition:color 0.25s ease;}
+    .contact-link:hover{color:var(--accent);}
+    .contact-link i{width:32px;height:32px;border-radius:8px;background:var(--accent-dim);display:flex;align-items:center;justify-content:center;font-size:0.78rem;color:var(--accent);transition:background 0.25s ease;flex-shrink:0;}
+    .contact-link:hover i{background:rgba(200,165,92,0.2);}
+    .soft-skill{display:flex;align-items:flex-start;gap:10px;padding:8px 0;font-size:0.86rem;color:var(--fg-muted);line-height:1.5;}
+    .soft-skill i{color:var(--accent);font-size:0.7rem;margin-top:5px;flex-shrink:0;}
+    .obiettivo-box{background:linear-gradient(135deg,rgba(200,165,92,0.06),rgba(0,212,170,0.04));border:1px solid rgba(200,165,92,0.15);border-radius:12px;padding:20px 24px;font-size:0.9rem;color:var(--fg-muted);line-height:1.75;position:relative;}
+    .obiettivo-box::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;border-radius:3px 0 0 3px;background:linear-gradient(180deg,var(--accent),var(--fiber));}
+    .project-card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;transition:all 0.4s cubic-bezier(0.4,0,0.2,1);cursor:default;display:flex;flex-direction:column;}
+    .project-card:hover{transform:translateY(-6px);border-color:rgba(200,165,92,0.3);box-shadow:0 20px 60px rgba(0,0,0,0.4),0 0 40px var(--accent-glow);}
+    .card-tech-header{width:100%;height:200px;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+    .card-tech-header::before{content:'';position:absolute;inset:0;opacity:0.06;background-image:url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 20.5V18H0v-2h20v-2H0v-2h20v-2H0V8h20V6H0V4h20V2H0V0h22v20h2V0h2v20h2V0h2v20h2V0h2v20h2V0h2v20.5z' fill='%23ffffff' fill-opacity='1'/%3E%3C/svg%3E");}
+    .card-tech-header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:50px;background:linear-gradient(transparent,var(--card));}
+    .brand-showcase{position:relative;z-index:2;display:flex;align-items:center;gap:24px;flex-wrap:wrap;justify-content:center;padding:20px;}
+    .brand-item{display:flex;flex-direction:column;align-items:center;gap:8px;opacity:0.85;transition:opacity 0.3s ease,transform 0.3s ease;}
+    .brand-item:hover{opacity:1;transform:scale(1.08);}
+    .brand-icon{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.08);}
+    .brand-label{font-size:0.65rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;opacity:0.7;}
+    .header-ubiquiti{background:linear-gradient(135deg,#1a1205 0%,#2a1a08 40%,#1a1205 100%);}.header-ubiquiti .brand-icon{background:rgba(229,137,0,0.12);color:#e58900;}.header-ubiquiti .brand-label{color:#e58900;}
+    .header-firewall{background:linear-gradient(135deg,#12080a 0%,#1f0e12 40%,#12080a 100%);}.header-firewall .brand-icon{background:rgba(220,60,60,0.10);color:#e05555;}.header-firewall .brand-icon.zyxel{background:rgba(60,130,220,0.10);color:#5ba3e6;}.header-firewall .brand-icon.watchguard{background:rgba(0,180,120,0.10);color:#00c080;}.header-firewall .brand-label{color:#cc8888;}
+    .header-ad-google{background:linear-gradient(135deg,#0a0e18 0%,#0e1220 40%,#0a0e18 100%);}.header-ad-google .brand-icon.windows{background:rgba(0,120,212,0.12);color:#0078d4;}.header-ad-google .brand-icon.google{background:rgba(66,133,244,0.10);color:#4285f4;}.header-ad-google .brand-icon.debian{background:rgba(215,60,0,0.10);color:#d73c00;}.header-ad-google .brand-label{color:#8899bb;}
+    .header-backup{background:linear-gradient(135deg,#0a1015 0%,#0e1820 40%,#0a1015 100%);}.header-backup .brand-icon{background:rgba(100,140,220,0.10);color:#8ab4f8;}.header-backup .brand-icon.synology{background:rgba(200,80,60,0.10);color:#e06848;}.header-backup .brand-label{color:#7799aa;}
+    .project-card .card-body{padding:0 28px 28px;flex:1;display:flex;flex-direction:column;}
+    .project-card .card-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 13px;font-size:0.72rem;font-weight:600;border-radius:100px;margin-bottom:14px;align-self:flex-start;letter-spacing:0.03em;text-transform:uppercase;}
+    .project-card .card-badge.infra{background:var(--accent-dim);color:var(--accent);border:1px solid rgba(200,165,92,0.15);}
+    .project-card .card-badge.auth{background:rgba(92,184,138,0.08);color:var(--success);border:1px solid rgba(92,184,138,0.15);}
+    .project-card .card-badge.backup{background:rgba(100,140,220,0.08);color:#8ab4f8;border:1px solid rgba(100,140,220,0.15);}
+    .project-card .card-title{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;margin-bottom:12px;line-height:1.3;}
+    .project-card .card-desc{font-size:0.86rem;color:var(--fg-muted);line-height:1.75;margin-bottom:18px;flex:1;}
+    .project-card .card-tags{display:flex;flex-wrap:wrap;gap:6px;padding-top:16px;border-top:1px solid var(--border);}
+    .lang-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;}
+    .lang-label{font-size:0.88rem;font-weight:500;}
+    .lang-level{font-size:0.78rem;color:var(--fg-muted);}
+    .lang-dots{display:flex;gap:5px;}
+    .lang-dot{width:10px;height:10px;border-radius:50%;background:var(--border);}
+    .lang-dot.on{background:var(--accent);}
+    .btn-primary{display:inline-flex;align-items:center;gap:10px;padding:14px 32px;background:var(--accent);color:var(--bg);font-weight:700;font-size:0.9rem;border-radius:100px;border:none;cursor:pointer;transition:all 0.3s ease;text-decoration:none;box-shadow:0 4px 20px var(--accent-glow);font-family:'DM Sans',sans-serif;}
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(200,165,92,0.4);}
+    .btn-outline{display:inline-flex;align-items:center;gap:10px;padding:14px 32px;background:transparent;color:var(--fg);font-weight:600;font-size:0.9rem;border-radius:100px;border:1px solid var(--border);cursor:pointer;transition:all 0.3s ease;text-decoration:none;font-family:'DM Sans',sans-serif;}
+    .btn-outline:hover{border-color:var(--accent);color:var(--accent);}
+    .nav-pill:focus-visible,.btn-primary:focus-visible,.btn-outline:focus-visible,.tag:focus-visible,.contact-link:focus-visible{outline:2px solid var(--accent);outline-offset:3px;}
+    .nav-pill:focus-visible{box-shadow:0 0 0 4px rgba(200,165,92,0.15);}
+    .reveal{opacity:0;transform:translateY(30px);transition:opacity 0.7s ease,transform 0.7s ease;}
+    .reveal.revealed{opacity:1;transform:translateY(0);}
+    .profile-img-wrap{width:140px;height:140px;border-radius:20px;overflow:hidden;flex-shrink:0;border:3px solid var(--accent);box-shadow:0 8px 30px rgba(200,165,92,0.2);background:var(--card);position:relative;}
+    .profile-img{width:100%;height:100%;object-fit:cover;object-position:center 20%;display:none;}
+    .profile-fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:2.4rem;font-weight:900;color:var(--accent);background:var(--accent-dim);}
+    .toast{position:fixed;bottom:30px;right:30px;z-index:200;background:var(--card);border:1px solid var(--accent);color:var(--fg);padding:16px 24px;border-radius:12px;font-size:0.88rem;box-shadow:0 10px 40px rgba(0,0,0,0.5);transform:translateY(100px);opacity:0;transition:all 0.4s cubic-bezier(0.4,0,0.2,1);display:flex;align-items:center;gap:10px;max-width:420px;}
+    .toast.show{transform:translateY(0);opacity:1;}
+    .filter-btn{cursor:pointer;font-family:'DM Sans',sans-serif;}
+    .filter-btn.active-filter{background:var(--accent)!important;color:var(--bg)!important;border-color:var(--accent)!important;}
+    .projects-grid-main{display:grid;grid-template-columns:repeat(2,1fr);gap:28px;}
+    .projects-grid-main .project-card:first-child{grid-column:1/-1;}
+    .projects-grid-main .project-card:first-child .card-tech-header{height:240px;}
+    .projects-grid-main .project-card:first-child .brand-icon{width:68px;height:68px;font-size:1.8rem;border-radius:16px;}
+    .projects-grid-main .project-card:first-child .brand-label{font-size:0.72rem;}
+    .projects-grid-main .project-card:first-child .card-body{padding:0 32px 32px;}
+    .projects-grid-main .project-card:first-child .card-title{font-size:1.35rem;}
+    .projects-grid-main .project-card:first-child .card-desc{font-size:0.9rem;max-width:800px;}
+    .site-footer{position:relative;z-index:2;border-top:1px solid var(--border);padding:48px 24px;}
+    .footer-inner{max-width:700px;margin:0 auto;text-align:center;}
+    .footer-name{font-family:'Playfair Display',serif;font-weight:700;font-size:1rem;color:var(--accent);margin-bottom:16px;}
+    .footer-ai-note{font-size:0.78rem;color:var(--fg-muted);line-height:1.7;margin-bottom:12px;opacity:0.7;}
+    .footer-ai-note i{color:var(--accent);margin-right:4px;font-size:0.7rem;}
+    .footer-ai-note strong{color:var(--fg-muted);font-weight:600;}
+    .footer-ai-toggle{display:inline-flex;align-items:center;gap:6px;font-size:0.72rem;color:var(--accent);cursor:pointer;border:none;background:none;font-family:'DM Sans',sans-serif;opacity:0.6;transition:opacity 0.2s ease;padding:4px 0;}
+    .footer-ai-toggle:hover{opacity:1;}
+    .footer-year{font-size:0.75rem;color:var(--fg-muted);opacity:0.4;margin-top:16px;}
+    .pdf-loading{position:fixed;inset:0;z-index:300;background:rgba(12,12,12,0.88);backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;flex-direction:column;gap:20px;}
+    .pdf-loading.active{display:flex;}
+    .pdf-spinner{width:48px;height:48px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .pdf-loading p{color:var(--fg-muted);font-size:0.9rem;}
+    .modal-overlay{position:fixed;inset:0;z-index:250;background:rgba(0,0,0,0.72);backdrop-filter:blur(12px) saturate(1.2);-webkit-backdrop-filter:blur(12px) saturate(1.2);display:none;align-items:center;justify-content:center;padding:24px;}
+    .modal-overlay.active{display:flex;}
+    .modal-overlay.active.opening{animation:overlayIn 220ms ease-out both;}
+    .modal-overlay.active.closing{animation:overlayOut 180ms ease-in both;}
+    .modal{width:min(1040px,100%);height:min(88vh,920px);background:rgba(24,24,24,0.92);border:1px solid rgba(255,255,255,0.08);border-radius:18px;box-shadow:0 30px 120px rgba(0,0,0,0.65);overflow:hidden;display:grid;grid-template-columns:1.15fr 0.85fr;}
+    .modal-overlay.active.opening .modal{animation:modalIn 260ms cubic-bezier(0.2,0.9,0.2,1) both;}
+    .modal-overlay.active.closing .modal{animation:modalOut 180ms ease-in both;}
+    @keyframes overlayIn{from{opacity:0;}to{opacity:1;}}
+    @keyframes overlayOut{from{opacity:1;}to{opacity:0;}}
+    @keyframes modalIn{from{opacity:0;transform:translateY(12px) scale(0.98);}to{opacity:1;transform:translateY(0) scale(1);}}
+    @keyframes modalOut{from{opacity:1;transform:translateY(0) scale(1);}to{opacity:0;transform:translateY(8px) scale(0.985);}}
+    .modal-left{position:relative;background:linear-gradient(180deg,rgba(200,165,92,0.06),transparent 60%);min-height:0;display:flex;flex-direction:column;}
+    .modal-right{border-left:1px solid var(--border);padding:26px 26px 22px;overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable;-webkit-overflow-scrolling:touch;min-height:0;}
+    .modal-topbar{position:absolute;top:14px;left:14px;right:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;z-index:2;}
+    .modal-title{font-family:'Playfair Display',serif;font-weight:800;font-size:1.05rem;letter-spacing:-0.01em;color:var(--fg);}
+    .modal-close{width:40px;height:40px;border-radius:12px;border:1px solid rgba(255,255,255,0.10);background:rgba(12,12,12,0.35);color:var(--fg);cursor:pointer;transition:transform 0.2s ease,border-color 0.2s ease;display:flex;align-items:center;justify-content:center;}
+    .modal-close:hover{transform:translateY(-1px);border-color:rgba(200,165,92,0.4);}
+    .gallery-stage{flex:1;display:flex;align-items:center;justify-content:center;position:relative;padding:54px 18px 18px;}
+    .gallery-img{width:100%;height:100%;object-fit:cover;border-radius:14px;border:1px solid rgba(255,255,255,0.08);background:rgba(12,12,12,0.35);max-height:calc(88vh - 170px);}
+    .gallery-nav{position:absolute;top:50%;transform:translateY(-50%);width:46px;height:46px;border-radius:14px;border:1px solid rgba(255,255,255,0.10);background:rgba(12,12,12,0.38);color:var(--fg);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform 0.2s ease,border-color 0.2s ease,opacity 0.2s ease;}
+    .gallery-nav:hover{transform:translateY(-50%) scale(1.03);border-color:rgba(200,165,92,0.4);}
+    .gallery-prev{left:20px;}
+    .gallery-next{right:20px;}
+    .gallery-thumbs{display:flex;gap:10px;padding:14px 18px 18px;overflow:auto;border-top:1px solid rgba(255,255,255,0.06);}
+    .thumb{width:74px;height:52px;border-radius:12px;flex:0 0 auto;object-fit:cover;border:1px solid rgba(255,255,255,0.10);opacity:0.7;cursor:pointer;transition:opacity 0.2s ease,border-color 0.2s ease,transform 0.2s ease;}
+    .thumb:hover{opacity:1;transform:translateY(-1px);}
+    .thumb.active{opacity:1;border-color:rgba(200,165,92,0.55);}
+    .modal-meta{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 18px;}
+    .modal-body{font-size:0.92rem;line-height:1.9;color:var(--fg-muted);overflow-wrap:anywhere;word-break:break-word;}
+    .modal-body h3{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--fg);margin:18px 0 8px;}
+    .modal-body p{margin:10px 0;}
+    .modal-body ul{margin:10px 0 10px 18px;color:var(--fg-muted);}
+    .modal-body li{margin:4px 0;}
+    body.modal-open{overflow:hidden;}
+    .modal-right::-webkit-scrollbar{width:10px;}
+    .modal-right::-webkit-scrollbar-track{background:rgba(12,12,12,0.25);border-left:1px solid rgba(255,255,255,0.04);}
+    .modal-right::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.12);border-radius:10px;border:2px solid rgba(12,12,12,0.35);}
+    .modal-right::-webkit-scrollbar-thumb:hover{background:rgba(200,165,92,0.35);}
+    @media(max-width:900px){.modal{grid-template-columns:1fr;height:92vh;}.modal-right{border-left:none;border-top:1px solid var(--border);} .gallery-img{max-height:46vh;} .gallery-prev{left:14px;} .gallery-next{right:14px;}}
+    @media(max-width:860px){.cv-grid{grid-template-columns:1fr!important;}.hero-name{font-size:2.3rem;}.cv-card{padding:24px;}.profile-img-wrap{width:110px;height:110px;}.hero-header-row{gap:18px;}.projects-grid-main{grid-template-columns:1fr!important;}.projects-grid-main .project-card:first-child{grid-column:auto;}.projects-grid-main .project-card:first-child .card-tech-header{height:200px;}.projects-grid-main .project-card:first-child .brand-icon{width:56px;height:56px;font-size:1.5rem;border-radius:14px;}}
+    @media(max-width:480px){.hero-cv{padding:120px 0 40px;}.nav-pill{padding:8px 18px;font-size:0.82rem;}.brand-showcase{gap:14px;}.brand-icon{width:46px;height:46px;font-size:1.2rem;}}
+    ::-webkit-scrollbar{width:6px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important;}}
+  </style>
+</head>
+<body>
+
+  <div class="bg-mesh" aria-hidden="true"><div class="blob blob-1"></div><div class="blob blob-2"></div><div class="blob blob-3"></div></div>
+  <div class="grain" aria-hidden="true"></div>
+
+  <div class="pdf-loading" id="pdf-loading">
+    <div class="pdf-spinner"></div>
+    <p>Generazione PDF in corso...</p>
+  </div>
+
+  <nav class="top-nav" role="navigation" aria-label="Navigazione principale">
+    <div style="max-width:1100px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;">
+      <div style="font-family:'Playfair Display',serif;font-weight:900;font-size:1.15rem;color:var(--accent);letter-spacing:-0.01em;">NDC<span style="color:var(--fg);">.</span></div>
+      <div style="display:flex;gap:8px;">
+        <button class="nav-pill active" data-page="curriculum" aria-label="Curriculum">Curriculum</button>
+        <button class="nav-pill" data-page="progetti" aria-label="Progetti">Progetti</button>
+      </div>
+    </div>
+  </nav>
+
+  <main style="position:relative;z-index:2;max-width:1100px;margin:0 auto;padding:0 24px 80px;">
+    <section class="page visible show" id="page-curriculum" aria-label="Curriculum Vitae">
+      <header class="hero-cv">
+        <div class="hero-header-row">
+          <div class="profile-img-wrap">
+            <img class="profile-img" id="profile-img"
+                 src="https://z-cdn-media.chatglm.cn/files/439f2c0e-23f1-4092-ad5f-b3735471283e.png?auth_key=1876896783-fd258df9096a44459d1012bcc25c6c96-0-e824b9797d1fe2b3bb7faff65f93deb1"
+                 onload="this.style.display='block';document.getElementById('profile-fallback').style.display='none';"
+                 onerror="this.style.display='none';document.getElementById('profile-fallback').style.display='flex';">
+            <div class="profile-fallback" id="profile-fallback">NC</div>
+          </div>
+          <div class="hero-header-text">
+            <h1 class="hero-name">Nicola&nbsp;De <span class="accent">Cristofaro</span></h1>
+            <p class="hero-role"><span class="hero-role-icon" aria-hidden="true"><i class="fas fa-server" style="color:var(--accent);"></i></span><span class="hero-role-icon" aria-hidden="true"><i class="fas fa-bolt" style="color:var(--fiber);"></i></span>Tecnico Sistemista con visione completa dell’infrastruttura di rete, dalla fibra ottica ai servizi IT enterprise.</p>
+            <div class="hero-line"></div>
+            <div style="margin-top:20px;display:flex;gap:12px;flex-wrap:wrap;">
+              <button class="btn-primary" onclick="downloadCV()"><i class="fas fa-file-pdf"></i> Scarica PDF</button>
+              <button class="btn-outline" onclick="copyEmail()"><i class="fas fa-envelope"></i> Contattami</button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div style="display:grid;grid-template-columns:1fr 370px;gap:28px;align-items:start;" class="cv-grid">
+        <div style="display:flex;flex-direction:column;gap:28px;">
+          <article class="cv-card reveal">
+            <h2 class="section-title"><span class="icon-circle"><i class="fas fa-user"></i></span> Profilo Professionale</h2>
+            <p style="font-size:0.92rem;color:var(--fg-muted);line-height:1.8;">Sistemista e specialista networking con esperienza nella progettazione, gestione e troubleshooting di infrastrutture IT e reti complesse in ambito scolastico e aziendale.<br><br>Competenze avanzate in reti LAN/WAN, sicurezza IT e sistemi Windows Server, con una conoscenza approfondita anche dell’infrastruttura fisica di rete in fibra ottica (FTTH/GPON), che consente una visione completa della connettività dal livello fisico fino ai servizi di rete.<br><br>Abituato a operare su sistemi critici, con focus su stabilità, continuità operativa e risoluzione efficace di problematiche infrastrutturali.</p>
+          </article>
+          <article class="cv-card reveal">
+            <div class="obiettivo-box"><strong style="color:var(--fg);font-size:0.88rem;"><i class="fas fa-crosshairs" style="color:var(--accent);margin-right:6px;"></i> Obiettivo Professionale</strong><br><br>Crescere come sistemista e specialista infrastrutturale di rete, lavorando su ambienti enterprise e infrastrutture distribuite, integrando competenze sistemistiche e di rete fisica per garantire affidabilità e continuità del servizio.</div>
+          </article>
+          <article class="cv-card reveal">
+            <h2 class="section-title"><span class="icon-circle"><i class="fas fa-briefcase"></i></span> Esperienza Lavorativa</h2>
+            <div class="timeline-item">
+              <div class="t-date">2019 — Presente</div>
+              <div class="t-role">Tecnico Informatico / Sistemista</div>
+              <div class="t-company">A.R. Informatica — RDC Services SRLS</div>
+              <ul class="t-desc" style="list-style:none;">
+                <li><i class="fas fa-angle-right" style="color:var(--accent);margin-right:6px;font-size:0.75rem;"></i>Progettazione e implementazione di infrastrutture di rete LAN/WAN per scuole e uffici</li>
+                <li><i class="fas fa-angle-right" style="color:var(--accent);margin-right:6px;font-size:0.75rem;"></i>Installazione e configurazione di armadi rack e cablaggio strutturato</li>
+                <li><i class="fas fa-angle-right" style="color:var(--accent);margin-right:6px;font-size:0.75rem;"></i>Configurazione switch managed e reti Wi-Fi professionali</li>
+                <li><i class="fas fa-angle-right" style="color:var(--accent);margin-right:6px;font-size:0.75rem;"></i>Segmentazione di rete tramite VLAN, gestione DHCP e indirizzamento IP</li>
+                <li><i class="fas fa-angle-right" style="color:var(--accent);margin-right:6px;font-size:0.75rem;"></i>Configurazione firewall (Fortinet, Zyxel, UniFi, Huawei)</li>
+                <li><i class="fas fa-angle-right" style="color:var(--accent);margin-right:6px;font-size:0.75rem;"></i>Implementazione VPN (SSL/IPsec) e sicurezza perimetrale</li>
+                <li><i class="fas fa-angle-right" style="color:var(--accent);margin-right:6px;font-size:0.75rem;"></i>Gestione server Windows (Active Directory, DNS, DHCP, GPO)</li>
+                <li><i class="fas fa-angle-right" style="color:var(--accent);margin-right:6px;font-size:0.75rem;"></i>Sistemi di backup e disaster recovery (Veeam, NAS, cloud)</li>
+                <li><i class="fas fa-angle-right" style="color:var(--accent);margin-right:6px;font-size:0.75rem;"></i>Gestione storage e configurazioni RAID</li>
+                <li><i class="fas fa-angle-right" style="color:var(--accent);margin-right:6px;font-size:0.75rem;"></i>Realizzazione collegamenti tra sedi tramite infrastrutture wireless</li>
+              </ul>
+              <div class="t-desc" style="margin-top:12px;">
+                <strong style="color:var(--fg);">Attività infrastrutturali su rete fisica (fibra ottica e connettività):</strong>
+                <ul style="list-style:none;margin-top:8px;">
+                  <li><i class="fas fa-angle-right" style="color:var(--fiber);margin-right:6px;font-size:0.75rem;"></i>Supporto e interventi su infrastrutture in fibra ottica FTTH/GPON</li>
+                  <li><i class="fas fa-angle-right" style="color:var(--fiber);margin-right:6px;font-size:0.75rem;"></i>Analisi e risoluzione guasti su tratte di rete attiva</li>
+                  <li><i class="fas fa-angle-right" style="color:var(--fiber);margin-right:6px;font-size:0.75rem;"></i>Verifica e collaudo della qualità della connettività su rete ottica</li>
+                  <li><i class="fas fa-angle-right" style="color:var(--fiber);margin-right:6px;font-size:0.75rem;"></i>Interventi su disservizi infrastrutturali con impatto su più utenze</li>
+                  <li><i class="fas fa-angle-right" style="color:var(--fiber);margin-right:6px;font-size:0.75rem;"></i>Comprensione dell’intera catena di rete (dal livello fisico al servizio finale)</li>
+                </ul>
+              </div>
+            </div>
+            <div class="timeline-item fiber-item">
+              <div class="t-date">2025 — Presente</div>
+              <div class="t-role">Specializzazione Infrastrutture di Rete (FTTH / GPON)</div>
+              <div class="t-company">Open Fiber</div>
+              <ul class="t-desc" style="list-style:none;">
+                <li><i class="fas fa-angle-right" style="color:var(--fiber);margin-right:6px;font-size:0.75rem;"></i>Attività su infrastrutture di rete in fibra ottica per accesso a banda ultra larga</li>
+                <li><i class="fas fa-angle-right" style="color:var(--fiber);margin-right:6px;font-size:0.75rem;"></i>Diagnosi guasti su tratte ottiche e infrastrutture attive</li>
+                <li><i class="fas fa-angle-right" style="color:var(--fiber);margin-right:6px;font-size:0.75rem;"></i>Analisi e validazione qualità segnale su collegamenti in fibra</li>
+                <li><i class="fas fa-angle-right" style="color:var(--fiber);margin-right:6px;font-size:0.75rem;"></i>Interventi su reti distribuite e infrastrutture attive</li>
+                <li><i class="fas fa-angle-right" style="color:var(--fiber);margin-right:6px;font-size:0.75rem;"></i>Interventi su reti distribuite con topologie complesse (anello / cascata)</li>
+                <li><i class="fas fa-angle-right" style="color:var(--fiber);margin-right:6px;font-size:0.75rem;"></i>Ripristino di disservizi critici su infrastrutture di connettività</li>
+                <li><i class="fas fa-angle-right" style="color:var(--fiber);margin-right:6px;font-size:0.75rem;"></i>Certificazione e verifica funzionale delle tratte di rete ottica</li>
+              </ul>
+              <div class="t-desc" style="margin-top:10px;">
+                <strong style="color:var(--fg);">Competenze maturate:</strong>
+                <ul style="list-style:none;margin-top:8px;">
+                  <li><i class="fas fa-angle-right" style="color:var(--fiber);margin-right:6px;font-size:0.75rem;"></i>Troubleshooting su infrastruttura fisica di rete</li>
+                  <li><i class="fas fa-angle-right" style="color:var(--fiber);margin-right:6px;font-size:0.75rem;"></i>Comprensione end-to-end della connettività (fibra → rete → servizi)</li>
+                  <li><i class="fas fa-angle-right" style="color:var(--fiber);margin-right:6px;font-size:0.75rem;"></i>Analisi di problemi su rete reale in produzione</li>
+                  <li><i class="fas fa-angle-right" style="color:var(--fiber);margin-right:6px;font-size:0.75rem;"></i>Elevata precisione operativa e gestione di sistemi critici</li>
+                </ul>
+              </div>
+            </div>
+          </article>
+
+        </div>
+        <aside style="display:flex;flex-direction:column;gap:28px;">
+          <article class="cv-card reveal">
+            <h2 class="section-title"><span class="icon-circle"><i class="fas fa-address-card"></i></span> Contatti</h2>
+            <a href="mailto:nicoladecristofaro@hotmail.it" class="contact-link"><i class="fas fa-envelope"></i> nicoladecristofaro@hotmail.it</a>
+            <a href="mailto:nicoladecristofaro23@pec.it" class="contact-link"><i class="fas fa-envelope-open-text"></i> nicoladecristofaro23@pec.it</a>
+            <a href="https://linkedin.com/in/nicoladecristofaro" target="_blank" rel="noopener" class="contact-link"><i class="fab fa-linkedin-in"></i> linkedin.com/in/nicoladecristofaro</a>
+            <div class="contact-link"><i class="fas fa-map-marker-alt"></i> Parete (CE), Italia</div>
+          </article>
+          <article class="cv-card reveal">
+            <h2 class="section-title"><span class="icon-circle"><i class="fas fa-cogs"></i></span> Competenze Tecniche</h2>
+            <div class="skill-category">
+              <div class="skill-cat-title"><i class="fas fa-network-wired"></i> Networking</div>
+              <div class="skill-items">
+                <span class="tag">VLAN</span>
+                <span class="tag">DHCP</span>
+                <span class="tag">NAT</span>
+                <span class="tag">Routing base</span>
+                <span class="tag">Firewall (Fortinet, Zyxel, UniFi, Huawei)</span>
+                <span class="tag">VPN SSL / IPsec</span>
+              </div>
+            </div>
+            <div class="skill-category">
+              <div class="skill-cat-title"><i class="fas fa-server"></i> Sistemi</div>
+              <div class="skill-items">
+                <span class="tag">Windows Server (AD, DNS, DHCP, GPO)</span>
+                <span class="tag">Gestione utenti e policy</span>
+                <span class="tag">Backup &amp; Disaster Recovery</span>
+              </div>
+            </div>
+            <div class="skill-category">
+              <div class="skill-cat-title"><i class="fas fa-sitemap"></i> Infrastrutture</div>
+              <div class="skill-items">
+                <span class="tag">Cablaggio strutturato e rack</span>
+                <span class="tag">Reti aziendali e multi-sede</span>
+                <span class="tag">Sistemi storage e RAID</span>
+              </div>
+            </div>
+            <div class="skill-category">
+              <div class="skill-cat-title"><i class="fas fa-bolt" style="color:var(--fiber);"></i> Fibra Ottica / FTTH</div>
+              <div class="skill-items">
+                <span class="tag fiber-tag">Reti GPON e infrastrutture FTTH</span>
+                <span class="tag fiber-tag">Diagnostica guasti su fibra ottica</span>
+                <span class="tag fiber-tag">Verifica e collaudo tratte</span>
+                <span class="tag fiber-tag">Comprensione topologie di rete ottica (primaria/secondaria)</span>
+              </div>
+            </div>
+          </article>
+          <article class="cv-card reveal">
+            <h2 class="section-title"><span class="icon-circle"><i class="fas fa-brain"></i></span> Competenze Trasversali</h2>
+            <div class="soft-skill"><i class="fas fa-check-circle"></i> Problem solving avanzato su infrastrutture critiche</div>
+            <div class="soft-skill"><i class="fas fa-check-circle"></i> Gestione interventi urgenti su rete attiva</div>
+            <div class="soft-skill"><i class="fas fa-check-circle"></i> Capacità di lavorare su più progetti contemporaneamente</div>
+            <div class="soft-skill"><i class="fas fa-check-circle"></i> Comunicazione tecnica con utenti e clienti</div>
+            <div class="soft-skill"><i class="fas fa-check-circle"></i> Adattabilità a tecnologie e ambienti complessi</div>
+          </article>
+          <article class="cv-card reveal">
+            <h2 class="section-title"><span class="icon-circle"><i class="fas fa-language"></i></span> Lingue</h2>
+            <div class="lang-row"><span class="lang-label">Italiano</span><div class="lang-dots"><div class="lang-dot on"></div><div class="lang-dot on"></div><div class="lang-dot on"></div><div class="lang-dot on"></div><div class="lang-dot on"></div></div><span class="lang-level">Madrelingua</span></div>
+            <div class="lang-row"><span class="lang-label">Inglese</span><div class="lang-dots"><div class="lang-dot on"></div><div class="lang-dot on"></div><div class="lang-dot on"></div><div class="lang-dot"></div><div class="lang-dot"></div></div><span class="lang-level">B1</span></div>
+          </article>
+          <article class="cv-card reveal">
+            <h2 class="section-title"><span class="icon-circle"><i class="fas fa-heart"></i></span> Interessi</h2>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;"><span class="tag">Informatica</span><span class="tag">Networking</span><span class="tag fiber-tag">Fibra Ottica</span><span class="tag">Motorsport</span><span class="tag">Videogiochi</span><span class="tag">Lettura</span></div>
+          </article>
+        </aside>
+      </div>
+    </section>
+
+    <section class="page" id="page-progetti" aria-label="Progetti">
+      <header class="hero-cv">
+        <h1 class="hero-name">Progetti <span class="accent">Chiave</span></h1>
+        <p class="hero-role">Realizzazioni significative in ambito scolastico e aziendale</p>
+        <div class="hero-line"></div>
+        <div style="margin-top:24px;display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="tag filter-btn active-filter" data-filter="tutti">Tutti</button>
+          <button class="tag filter-btn" data-filter="infra">Infrastruttura</button>
+          <button class="tag filter-btn" data-filter="server">Server & Sicurezza</button>
+          <button class="tag filter-btn" data-filter="backup">Backup & Recovery</button>
+        </div>
+      </header>
+      <div class="projects-grid-main" id="projects-grid"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-name">Nicola De Cristofaro</div>
+      <p class="footer-ai-note" id="footer-note"><i class="fas fa-robot"></i> Questa pagina è stata creata con l'aiuto dell'intelligenza artificiale. È una scelta consapevole: l'IA ha dato forma al design e al codice, ma <strong>ogni parola, ogni competenza, ogni esperienza che leggi qui è reale e verificabile</strong>. Non c'è nulla di inventato. Solo la verità, presentata nel modo migliore possibile.</p>
+      <button class="footer-ai-toggle" onclick="toggleNote()" id="footer-toggle"><i class="fas fa-eye-slash"></i> nascondi nota</button>
+      <div class="footer-year">2026</div>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast" aria-live="polite"></div>
+
+  <div class="modal-overlay" id="project-modal" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Dettaglio progetto">
+    <div class="modal" role="document" tabindex="-1" id="project-modal-panel">
+      <div class="modal-left">
+        <div class="modal-topbar">
+          <div class="modal-title" id="project-modal-title">Progetto</div>
+          <button class="modal-close" id="project-modal-close" aria-label="Chiudi"><i class="fas fa-xmark"></i></button>
+        </div>
+        <div class="gallery-stage">
+          <button class="gallery-nav gallery-prev" id="gallery-prev" aria-label="Immagine precedente"><i class="fas fa-chevron-left"></i></button>
+          <img class="gallery-img" id="gallery-image" alt="" loading="lazy">
+          <button class="gallery-nav gallery-next" id="gallery-next" aria-label="Immagine successiva"><i class="fas fa-chevron-right"></i></button>
+        </div>
+        <div class="gallery-thumbs" id="gallery-thumbs" aria-label="Anteprime galleria"></div>
+      </div>
+      <div class="modal-right">
+        <div class="modal-meta" id="project-modal-tags"></div>
+        <div class="modal-body" id="project-modal-body"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ==============================================
+       FOOTER
+       ============================================== */
+    var noteVisible = true;
+    function toggleNote() {
+      var n = document.getElementById('footer-note'), t = document.getElementById('footer-toggle');
+      noteVisible = !noteVisible;
+      n.style.maxHeight = noteVisible ? '200px' : '0';
+      n.style.opacity = noteVisible ? '0.7' : '0';
+      n.style.marginBottom = noteVisible ? '12px' : '0';
+      t.innerHTML = noteVisible ? '<i class="fas fa-eye-slash"></i> nascondi nota' : '<i class="fas fa-eye"></i> nota sull\'IA';
+    }
+    var fn = document.getElementById('footer-note');
+    fn.style.transition = 'max-height 0.4s ease, opacity 0.3s ease, margin-bottom 0.3s ease';
+    fn.style.maxHeight = '200px';
+    fn.style.overflow = 'hidden';
+
+    /* ==============================================
+       PROGETTI
+       ============================================== */
+    var projects = [
+      {
+        id: 'multi-plesso',
+        title: 'Infrastruttura Rete Multi-Plesso con Ponti Radio',
+        desc: "Progettazione e realizzazione dell'infrastruttura di rete completa per un istituto con 5 plessi distribuiti sul territorio.",
+        tags: ['Ubiquiti airMAX', 'Beam', 'Ponte Radio P2MP', 'VLAN', 'Firewall', 'Cablaggio Strutturato'],
+        category: 'infra',
+        badge: 'Infrastruttura Rete',
+        badgeClass: 'infra',
+        headerHTML: '<div class="card-tech-header header-ubiquiti"><div class="brand-showcase"><div class="brand-item"><div class="brand-icon"><i class="fas fa-broadcast-tower"></i></div><span class="brand-label">airMAX</span></div><div class="brand-item"><div class="brand-icon"><i class="fas fa-satellite-dish"></i></div><span class="brand-label">Beam</span></div><div class="brand-item"><div class="brand-icon"><i class="fas fa-wifi"></i></div><span class="brand-label">UniFi AP</span></div><div class="brand-item"><div class="brand-icon"><i class="fas fa-project-diagram"></i></div><span class="brand-label">P2MP</span></div><div class="brand-item"><div class="brand-icon"><i class="fas fa-network-wired"></i></div><span class="brand-label">VLAN</span></div></div></div>',
+        gallery: [
+          'assets/projects/multi-plesso/01.jpg',
+          'assets/projects/multi-plesso/02.jpg',
+          'assets/projects/multi-plesso/03.jpg'
+        ],
+        article: `In questo caso abbiamo affrontato la seguente problematica: l’istituto necessitava di connessioni tra più plessi situati nello stesso spiazzale, ma non direttamente adiacenti tra loro, con impossibilità di effettuare scavi per il passaggio dei cavi.
+
+La connettività principale era basata su fibra ottica a 1 Gbps, terminata su un router Huawei AR651, con connessione LTE di backup per garantire ridondanza in caso di down della linea principale. La fibra era stata recentemente installata, ma l’istituto disponeva di un budget limitato e si rendeva necessario attrezzare in tempi rapidi 6 edifici con una connessione stabile e funzionale.
+
+È stata effettuata un’analisi dell’hardware disponibile e sono stati recuperati circa 40 access point Ubiquiti AC-Lite. L’infrastruttura esistente utilizzava switch Gigabit standard TP-Link, ma non è stato possibile sostituirli né intervenire sulla loro configurazione avanzata, limitando quindi la possibilità di implementare VLAN per la segmentazione della rete.
+
+Per garantire uniformità e semplificare configurazione, manutenzione e assistenza, è stato scelto di rimanere all’interno dello stesso ecosistema Ubiquiti.
+
+La soluzione è stata progettata partendo dall’edificio principale, dove è stato installato sul tetto un Ubiquiti airMAX Rocket Prism 5AC, scelto per la capacità di coprire più plessi con un unico punto di trasmissione. Il dispositivo è stato cablato dal router principale tramite cavo Cat6 per esterni.
+
+Da questo nodo principale è stata distribuita la connettività verso 4 edifici, sui quali sono stati installati come ricevitori gli Ubiquiti airMAX NanoStation 5AC Loco. In questo modo è stata realizzata una rete punto-multipunto stabile, con velocità per singolo plesso tra 200 e 300 Mbps in download, sufficiente a garantire sia la rete LAN che il corretto funzionamento della rete Wi-Fi basata sugli access point AC-Lite.
+
+Per i due plessi rimanenti, che non erano raggiungibili in modo efficiente dalla prima tratta, è stata adottata una soluzione punto-punto dedicata utilizzando 4 Ubiquiti airMAX PowerBeam M5 300, installati sulle facciate degli edifici. Anche in questo caso il collegamento è stato realizzato tramite cablaggio Cat6 da esterno, ottenendo una banda stabile compresa tra 200 e 300 Mbps.
+
+Dal punto di vista logico di rete, non essendo stato possibile implementare VLAN a causa dei limiti dell’infrastruttura di switching, è stata adottata una configurazione semplificata basata su indirizzi statici nella rete 192.168.48.x/22 e distribuzione DHCP da 192.168.49.x a 192.168.51.x.
+
+La gestione centralizzata dell’intera infrastruttura è stata affidata a una Ubiquiti UniFi Cloud Key UC-CK, utilizzata per il controllo, la configurazione e l’aggiornamento firmware di tutti i dispositivi installati.
+
+A livello di ottimizzazione, è stata abilitata la QoS per la gestione del traffico e il bilanciamento della rete.
+
+Il risultato finale è stata una infrastruttura wireless completa e funzionale, in grado di collegare 6 edifici senza opere di scavo, con prestazioni stabili e una gestione centralizzata semplificata.`
+      },
+      {
+        id: 'fesr-pon',
+        title: 'Progetto FESR/PON — Infrastruttura Scolastica Chiavi in Mano',
+        desc: "Realizzazione completa di infrastrutture di rete in istituti scolastici nell'ambito dei progetti FESR e PNRR 2023-2024.",
+        tags: ['FESR / PNRR', 'UniFi U6', 'FortiGate 60F', 'WatchGuard T40-W', 'Cat.6/6A', 'SSL-VPN'],
+        category: 'infra',
+        badge: 'Infrastruttura Rete',
+        badgeClass: 'infra',
+        headerHTML: '<div class="card-tech-header header-firewall"><div class="brand-showcase"><div class="brand-item"><div class="brand-icon"><i class="fas fa-shield-alt"></i></div><span class="brand-label">FortiGate</span></div><div class="brand-item"><div class="brand-icon zyxel"><i class="fas fa-lock"></i></div><span class="brand-label">Zyxel</span></div><div class="brand-item"><div class="brand-icon watchguard"><i class="fas fa-eye"></i></div><span class="brand-label">WatchGuard</span></div><div class="brand-item"><div class="brand-icon" style="background:rgba(229,137,0,0.10);color:#e58900;"><i class="fas fa-circle-nodes"></i></div><span class="brand-label" style="color:#e58900;">UDM Pro</span></div><div class="brand-item"><div class="brand-icon" style="background:rgba(100,140,220,0.08);color:#8ab4f8;"><i class="fas fa-key"></i></div><span class="brand-label" style="color:#8899bb;">SSL-VPN</span></div></div></div>',
+        gallery: [
+          'assets/projects/fesr-pon/01.jpg',
+          'assets/projects/fesr-pon/02.jpg'
+        ],
+        articleHTML: '<h3>Descrizione</h3><p>Scrivi qui il tuo articolo (testo a mano) sul progetto FESR/PON.</p>'
+      },
+      {
+        id: 'ad-radius',
+        title: 'Active Directory, GPO e FreeRADIUS con Google Workspace',
+        desc: "Implementazione di un sistema di autenticazione centralizzata e Wi-Fi enterprise.",
+        tags: ['Active Directory', 'GPO', 'FreeRADIUS', 'Google Workspace', 'Windows Server', 'Debian'],
+        category: 'server',
+        badge: 'Server & Autenticazione',
+        badgeClass: 'auth',
+        headerHTML: '<div class="card-tech-header header-ad-google"><div class="brand-showcase"><div class="brand-item"><div class="brand-icon windows"><i class="fab fa-windows"></i></div><span class="brand-label">Windows Server</span></div><div class="brand-item"><div class="brand-icon windows" style="background:rgba(0,120,212,0.08);"><i class="fas fa-sitemap"></i></div><span class="brand-label">Active Directory</span></div><div class="brand-item"><div class="brand-icon google"><i class="fab fa-google"></i></div><span class="brand-label" style="color:#4285f4;">Google Workspace</span></div><div class="brand-item"><div class="brand-icon debian"><i class="fab fa-linux"></i></div><span class="brand-label">Debian</span></div><div class="brand-item"><div class="brand-icon" style="background:rgba(92,184,138,0.08);color:var(--success);"><i class="fas fa-wifi"></i></div><span class="brand-label" style="color:var(--success);">FreeRADIUS</span></div></div></div>',
+        gallery: [
+          'assets/projects/ad-radius/01.jpg'
+        ],
+        articleHTML: '<h3>Obiettivo</h3><p>Scrivi qui il tuo articolo (testo a mano) su AD/GPO/FreeRADIUS.</p>'
+      },
+      {
+        id: 'backup-dr',
+        title: 'Sistema di Backup e Disaster Recovery',
+        desc: 'Strategia completa di backup e DR con NAS e Veeam, test periodici di restore.',
+        tags: ['Synology NAS', 'Veeam', 'Backup Incrementale', 'Disaster Recovery', 'Virtualizzazione'],
+        category: 'backup',
+        badge: 'Backup & Recovery',
+        badgeClass: 'backup',
+        headerHTML: '<div class="card-tech-header header-backup"><div class="brand-showcase"><div class="brand-item"><div class="brand-icon synology"><i class="fas fa-hdd"></i></div><span class="brand-label" style="color:#e06848;">Synology</span></div><div class="brand-item"><div class="brand-icon"><i class="fas fa-database"></i></div><span class="brand-label">Veeam</span></div><div class="brand-item"><div class="brand-icon" style="background:rgba(100,140,220,0.06);"><i class="fas fa-layer-group"></i></div><span class="brand-label">RAID</span></div><div class="brand-item"><div class="brand-icon" style="background:rgba(200,165,92,0.08);color:var(--accent);"><i class="fas fa-cubes"></i></div><span class="brand-label" style="color:var(--accent);">Virtualizzazione</span></div></div></div>',
+        gallery: [
+          'assets/projects/backup-dr/01.jpg',
+          'assets/projects/backup-dr/02.jpg'
+        ],
+        articleHTML: '<h3>Strategia</h3><p>Scrivi qui il tuo articolo (testo a mano) su backup &amp; DR.</p>'
+      }
+    ];
+
+    /* ==============================================
+       NAVIGAZIONE
+       ============================================== */
+    var navPills = document.querySelectorAll('.nav-pill'), pages = document.querySelectorAll('.page');
+    navPills.forEach(function(pill) {
+      pill.addEventListener('click', function() {
+        var t = pill.dataset.page;
+        navPills.forEach(function(p) { p.classList.remove('active'); });
+        pill.classList.add('active');
+        pages.forEach(function(page) {
+          if (page.id === 'page-' + t) {
+            page.classList.add('visible'); void page.offsetWidth;
+            requestAnimationFrame(function() { page.classList.add('show'); });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            setTimeout(function() { triggerReveals(page); }, 100);
+          } else {
+            page.classList.remove('show');
+            setTimeout(function() { page.classList.remove('visible'); }, 500);
+          }
+        });
+      });
+    });
+
+    /* ==============================================
+       RENDER PROGETTI
+       ============================================== */
+    var projectsGrid = document.getElementById('projects-grid');
+    function renderProjects(filter) {
+      var f = filter === 'tutti' ? projects : projects.filter(function(p) { return p.category === filter; });
+      projectsGrid.innerHTML = '';
+      f.forEach(function(p, i) {
+        var c = document.createElement('article');
+        c.className = 'project-card reveal';
+        c.setAttribute('role', 'button');
+        c.setAttribute('tabindex', '0');
+        c.setAttribute('aria-label', 'Apri progetto: ' + p.title);
+        c.style.transitionDelay = (i * 0.1) + 's';
+        var ic = p.badgeClass === 'infra' ? 'fa-network-wired' : p.badgeClass === 'auth' ? 'fa-shield-alt' : 'fa-database';
+        c.innerHTML = p.headerHTML + '<div class="card-body"><div class="card-badge ' + p.badgeClass + '"><i class="fas ' + ic + '" style="font-size:0.65rem;"></i> ' + p.badge + '</div><h3 class="card-title">' + p.title + '</h3><p class="card-desc">' + p.desc + '</p><div class="card-tags">' + p.tags.map(function(t) { return '<span class="tag">' + t + '</span>'; }).join('') + '</div></div>';
+        c.addEventListener('click', function() { openProjectModal(p); });
+        c.addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openProjectModal(p); } });
+        projectsGrid.appendChild(c);
+      });
+      setTimeout(function() { triggerReveals(document.getElementById('page-progetti')); }, 50);
+    }
+    document.querySelectorAll('.filter-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active-filter'); });
+        btn.classList.add('active-filter');
+        renderProjects(btn.dataset.filter);
+      });
+    });
+    renderProjects('tutti');
+
+    /* ==============================================
+       MODAL PROGETTI (Overlay)
+       ============================================== */
+    var modal = document.getElementById('project-modal');
+    var modalPanel = document.getElementById('project-modal-panel');
+    var modalTitle = document.getElementById('project-modal-title');
+    var modalTags = document.getElementById('project-modal-tags');
+    var modalBody = document.getElementById('project-modal-body');
+    var modalClose = document.getElementById('project-modal-close');
+    var galleryImage = document.getElementById('gallery-image');
+    var galleryThumbs = document.getElementById('gallery-thumbs');
+    var galleryPrev = document.getElementById('gallery-prev');
+    var galleryNext = document.getElementById('gallery-next');
+
+    var modalState = { open: false, project: null, index: 0, lastFocus: null };
+
+    function escapeHTML(s) {
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function renderArticle(project) {
+      if (project && typeof project.article === 'string' && project.article.trim()) {
+        var text = project.article.replace(/\r\n/g, '\n').trim();
+        var blocks = text.split(/\n\s*\n+/g).map(function(b) { return b.trim(); }).filter(Boolean);
+        return blocks.map(function(b) {
+          var html = escapeHTML(b).replace(/\n/g, '<br>');
+          return '<p>' + html + '</p>';
+        }).join('');
+      }
+      if (project && typeof project.articleHTML === 'string' && project.articleHTML.trim()) return project.articleHTML;
+      return '<p>Articolo non ancora inserito.</p>';
+    }
+
+    function setGalleryIndex(idx) {
+      if (!modalState.project) return;
+      var g = modalState.project.gallery || [];
+      if (!g.length) {
+        galleryImage.src = '';
+        galleryImage.alt = '';
+        galleryPrev.style.opacity = '0.25';
+        galleryNext.style.opacity = '0.25';
+        return;
+      }
+      modalState.index = (idx + g.length) % g.length;
+      galleryImage.src = g[modalState.index];
+      galleryImage.alt = modalState.project.title + ' — immagine ' + (modalState.index + 1) + ' di ' + g.length;
+      galleryPrev.style.opacity = g.length > 1 ? '1' : '0.25';
+      galleryNext.style.opacity = g.length > 1 ? '1' : '0.25';
+      Array.prototype.slice.call(galleryThumbs.querySelectorAll('.thumb')).forEach(function(t, i) {
+        t.classList.toggle('active', i === modalState.index);
+      });
+    }
+
+    function buildThumbs(project) {
+      var g = project.gallery || [];
+      galleryThumbs.innerHTML = '';
+      if (!g.length) return;
+      g.forEach(function(src, i) {
+        var im = document.createElement('img');
+        im.className = 'thumb' + (i === 0 ? ' active' : '');
+        im.src = src;
+        im.alt = project.title + ' — anteprima ' + (i + 1);
+        im.loading = 'lazy';
+        im.addEventListener('click', function() { setGalleryIndex(i); });
+        galleryThumbs.appendChild(im);
+      });
+    }
+
+    function openProjectModal(project) {
+      modalState.lastFocus = document.activeElement;
+      modalState.open = true;
+      modalState.project = project;
+      modalState.index = 0;
+
+      modalTitle.textContent = project.title;
+      modalTags.innerHTML = (project.tags || []).map(function(t) { return '<span class="tag">' + t + '</span>'; }).join('');
+      modalBody.innerHTML = renderArticle(project);
+
+      buildThumbs(project);
+      setGalleryIndex(0);
+
+      modal.classList.add('active');
+      modal.classList.remove('closing');
+      modal.classList.add('opening');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('modal-open');
+      setTimeout(function() { modal.classList.remove('opening'); modalClose.focus(); }, 280);
+    }
+
+    function closeProjectModal() {
+      if (!modalState.open) return;
+      modal.classList.remove('opening');
+      modal.classList.add('closing');
+      setTimeout(function() {
+        modalState.open = false;
+        modalState.project = null;
+        modal.classList.remove('active');
+        modal.classList.remove('closing');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('modal-open');
+        if (modalState.lastFocus && modalState.lastFocus.focus) modalState.lastFocus.focus();
+      }, 190);
+      return;
+    }
+
+    function focusTrap(e) {
+      if (!modalState.open || e.key !== 'Tab') return;
+      var focusable = modalPanel.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])');
+      focusable = Array.prototype.slice.call(focusable).filter(function(el) { return !el.hasAttribute('disabled') && el.offsetParent !== null; });
+      if (!focusable.length) return;
+      var first = focusable[0];
+      var last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+
+    modalClose.addEventListener('click', closeProjectModal);
+    modal.addEventListener('mousedown', function(e) { if (e.target === modal) closeProjectModal(); });
+    document.addEventListener('keydown', function(e) {
+      if (!modalState.open) return;
+      if (e.key === 'Escape') { e.preventDefault(); closeProjectModal(); return; }
+      if (e.key === 'ArrowLeft') { e.preventDefault(); setGalleryIndex(modalState.index - 1); return; }
+      if (e.key === 'ArrowRight') { e.preventDefault(); setGalleryIndex(modalState.index + 1); return; }
+      focusTrap(e);
+    });
+    galleryPrev.addEventListener('click', function() { setGalleryIndex(modalState.index - 1); });
+    galleryNext.addEventListener('click', function() { setGalleryIndex(modalState.index + 1); });
+
+    /* ==============================================
+       REVEAL
+       ============================================== */
+    function triggerReveals(container) {
+      var r = (container || document).querySelectorAll('.reveal:not(.revealed)');
+      var o = new IntersectionObserver(function(e) { e.forEach(function(en) { if (en.isIntersecting) { en.target.classList.add('revealed'); o.unobserve(en.target); } }); }, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
+      r.forEach(function(el) { o.observe(el); });
+    }
+    triggerReveals();
+
+    /* ==============================================
+       SCARICA PDF — jsPDF
+       Genera il PDF interamente da codice JavaScript.
+       Zero immagini esterne, zero CORS, zero html2canvas.
+       Scarica SEMPRE direttamente. Impossibile che fallisca.
+       ============================================== */
+    function downloadCV() {
+      var loader = document.getElementById('pdf-loading');
+      loader.classList.add('active');
+
+      setTimeout(function() {
+        try {
+          var doc = new window.jspdf.jsPDF('p', 'mm', 'a4');
+
+          /* Colori */
+          var gold = [200, 165, 92];
+          var dark = [26, 26, 26];
+          var gray = [85, 85, 85];
+          var ltGray = [119, 119, 119];
+          var txtGray = [68, 68, 68];
+          var txtDark = [51, 51, 51];
+          var cream = [250, 248, 244];
+          var lineGray = [221, 221, 221];
+
+          /* Margini e layout */
+          var lm = 11, rm = 11, tm = 10;
+          var pw = 210 - lm - rm;
+          var colLW = 116, colRW = pw - colLW - 16;
+
+          var y = tm;
+
+          /* === HEADER === */
+          /* Quadrato foto */
+          doc.setFillColor.apply(doc, gold);
+          doc.roundedRect(lm, y, 13, 13, 2, 2, 'F');
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(8);
+          doc.setTextColor.apply(doc, dark);
+          doc.text('NC', lm + 6.5, y + 8.2, { align: 'center' });
+
+          /* Nome */
+          doc.setFontSize(19);
+          doc.setTextColor.apply(doc, dark);
+          doc.text('Nicola De Cristofaro', lm + 17, y + 5.5);
+
+          /* Ruolo */
+          doc.setFontSize(8);
+          doc.setTextColor.apply(doc, ltGray);
+          doc.text('Sistemista / Giuntista Fibra Ottica', lm + 17, y + 10.5);
+
+          /* Contatti */
+          doc.setFontSize(7.4);
+          doc.setTextColor.apply(doc, gray);
+          var cx = 210 - rm;
+          doc.text('nicoladecristofaro@hotmail.it', cx, y + 2.5, { align: 'right' });
+          doc.text('nicoladecristofaro23@pec.it', cx, y + 5.8, { align: 'right' });
+          doc.text('linkedin.com/in/nicoladecristofaro', cx, y + 9.1, { align: 'right' });
+          doc.text('Parete (CE), Italia', cx, y + 12.4, { align: 'right' });
+
+          y += 17.5;
+
+          /* Linea oro */
+          doc.setDrawColor.apply(doc, gold);
+          doc.setLineWidth(0.7);
+          doc.line(lm, y, 210 - rm, y);
+          y += 6;
+
+          /* === COLONNA SINISTRA === */
+          var lx = lm;
+
+          /* Profilo */
+          doc.setFontSize(9);
+          doc.setFont('helvetica', 'bold');
+          doc.setTextColor.apply(doc, gold);
+          doc.text('PROFILO PROFESSIONALE', lx, y);
+          y += 1.2;
+          doc.setDrawColor.apply(doc, lineGray);
+          doc.setLineWidth(0.25);
+          doc.line(lx, y, lx + colLW, y);
+          y += 3.8;
+
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(8.4);
+          doc.setTextColor.apply(doc, txtDark);
+          var profLines = doc.splitTextToSize('Sistemista e specialista networking con esperienza nella progettazione, gestione e troubleshooting di infrastrutture IT e reti complesse in ambito scolastico e aziendale. Competenze avanzate in reti LAN/WAN, sicurezza IT e sistemi Windows Server, con una conoscenza approfondita anche dell\u2019infrastruttura fisica di rete in fibra ottica (FTTH/GPON), per una visione completa della connettivit\u00E0 dal livello fisico fino ai servizi di rete. Focus su stabilit\u00E0 e continuit\u00E0 operativa.', colLW);
+          doc.text(profLines, lx, y);
+          y += profLines.length * 3.6 + 3;
+
+          /* Esperienza */
+          doc.setFontSize(9);
+          doc.setFont('helvetica', 'bold');
+          doc.setTextColor.apply(doc, gold);
+          doc.text('ESPERIENZA LAVORATIVA', lx, y);
+          y += 1.2;
+          doc.line(lx, y, lx + colLW, y);
+          y += 3.8;
+
+          /* Exp 1 */
+          doc.setFontSize(9);
+          doc.setTextColor.apply(doc, dark);
+          doc.text('Sistemista', lx, y);
+          doc.setFontSize(6.8);
+          doc.setTextColor(153, 153, 153);
+          doc.text('2019 \u2014 Presente', lx + colLW, y, { align: 'right' });
+          y += 3.3;
+          doc.setFontSize(7.4);
+          doc.setTextColor.apply(doc, ltGray);
+          doc.text('A.R. Informatica \u2014 RDC Services SRLS', lx, y);
+          y += 3.8;
+
+          var exp1 = [
+            'Progettazione e implementazione di infrastrutture di rete LAN/WAN per scuole e uffici',
+            'Installazione e configurazione di armadi rack e cablaggio strutturato',
+            'Configurazione switch managed e reti Wi-Fi professionali',
+            'Segmentazione di rete tramite VLAN, gestione DHCP e indirizzamento IP',
+            'Configurazione firewall (Fortinet, Zyxel, UniFi, Huawei)',
+            'Implementazione VPN (SSL/IPsec) e sicurezza perimetrale',
+            'Gestione server Windows (Active Directory, DNS, DHCP, GPO)',
+            'Sistemi di backup e disaster recovery (Veeam, NAS, cloud)',
+            'Gestione storage e configurazioni RAID',
+            'Realizzazione collegamenti tra sedi tramite infrastrutture wireless'
+          ];
+          doc.setFontSize(7.8);
+          doc.setTextColor.apply(doc, txtGray);
+          exp1.forEach(function(item) {
+            var lines = doc.splitTextToSize(item, colLW - 4);
+            lines.forEach(function(line) {
+              doc.text(line, lx + 3, y);
+              y += 3;
+            });
+            y += 0.3;
+          });
+          y += 2;
+
+          /* Exp 2 */
+          doc.setFontSize(9);
+          doc.setFont('helvetica', 'bold');
+          doc.setTextColor.apply(doc, dark);
+          doc.text('Specializzazione FTTH/GPON', lx, y);
+          doc.setFontSize(6.8);
+          doc.setTextColor(153, 153, 153);
+          doc.text('2025 \u2014 Presente', lx + colLW, y, { align: 'right' });
+          y += 3.3;
+          doc.setFontSize(7.4);
+          doc.setTextColor.apply(doc, ltGray);
+          doc.text('Open Fiber', lx, y);
+          y += 3.8;
+
+          var exp2 = [
+            'Attivit\u00E0 su infrastrutture di rete in fibra ottica per accesso a banda ultra larga',
+            'Diagnosi guasti su tratte ottiche e infrastrutture attive',
+            'Analisi e validazione qualit\u00E0 segnale su collegamenti in fibra',
+            'Interventi su reti distribuite e infrastrutture attive',
+            'Interventi su reti distribuite con topologie complesse (anello / cascata)',
+            'Ripristino di disservizi critici su infrastrutture di connettivit\u00E0',
+            'Certificazione e verifica funzionale delle tratte di rete ottica'
+          ];
+          doc.setFontSize(7.8);
+          doc.setTextColor.apply(doc, txtGray);
+          exp2.forEach(function(item) {
+            var lines = doc.splitTextToSize(item, colLW - 4);
+            lines.forEach(function(line) {
+              doc.text(line, lx + 3, y);
+              y += 3;
+            });
+            y += 0.3;
+          });
+          y += 2;
+
+          /* Obiettivo */
+          var obH = 16;
+          doc.setFillColor.apply(doc, cream);
+          doc.roundedRect(lx, y, colLW, obH, 1, 1, 'F');
+          doc.setFillColor.apply(doc, gold);
+          doc.rect(lx, y, 0.7, obH, 'F');
+
+          doc.setFontSize(8.5);
+          doc.setFont('helvetica', 'bold');
+          doc.setTextColor.apply(doc, gold);
+          doc.text('OBIETTIVO PROFESSIONALE', lx + 3.5, y + 5);
+
+          doc.setFontSize(7.6);
+          doc.setFont('helvetica', 'normal');
+          doc.setTextColor.apply(doc, txtGray);
+          var obLines = doc.splitTextToSize('Crescere come sistemista e specialista infrastrutturale di rete, lavorando su ambienti enterprise e infrastrutture distribuite, integrando competenze sistemistiche e di rete fisica per garantire affidabilit\u00E0 e continuit\u00E0 del servizio.', colLW - 7);
+          doc.text(obLines, lx + 3.5, y + 9);
+
+          /* === COLONNA DESTRA === */
+          var rx = lm + colLW + 16;
+          var ry = tm + 24;
+
+          /* Competenze */
+          doc.setFontSize(8.5);
+          doc.setFont('helvetica', 'bold');
+          doc.setTextColor.apply(doc, gold);
+          doc.text('COMPETENZE TECNICHE', rx, ry);
+          ry += 1.2;
+          doc.line(rx, ry, rx + colRW, ry);
+          ry += 3.8;
+
+          var comp = [
+            { c: 'Networking: ', v: 'VLAN, DHCP, NAT, routing base, firewall (Fortinet, Zyxel, UniFi, Huawei), VPN SSL / IPsec' },
+            { c: 'Sistemi: ', v: 'Windows Server (AD, DNS, DHCP, GPO), gestione utenti e policy, backup & disaster recovery' },
+            { c: 'Infrastrutture: ', v: 'Cablaggio strutturato e rack, reti aziendali e multi-sede, sistemi storage e RAID' },
+            { c: 'Fibra Ottica / FTTH: ', v: 'Reti GPON e infrastrutture FTTH, diagnostica guasti, verifica e collaudo tratte, topologie (primaria/secondaria)' }
+          ];
+          doc.setFontSize(7.2);
+          comp.forEach(function(item) {
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor.apply(doc, txtDark);
+            var full = item.c + item.v;
+            var lines = doc.splitTextToSize(full, colRW);
+            lines.forEach(function(line) {
+              doc.text(line, rx, ry);
+              ry += 3;
+            });
+            ry += 1.8;
+          });
+
+          ry += 0.5;
+
+          /* Soft Skills */
+          doc.setFontSize(8.5);
+          doc.setFont('helvetica', 'bold');
+          doc.setTextColor.apply(doc, gold);
+          doc.text('SOFT SKILLS', rx, ry);
+          ry += 1.2;
+          doc.line(rx, ry, rx + colRW, ry);
+          ry += 3.8;
+
+          doc.setFontSize(7.2);
+          doc.setTextColor.apply(doc, gray);
+          ['Problem solving avanzato', 'Gestione emergenze', 'Multi-tasking', 'Comunicazione tecnica', 'Adattabilit\u00E0'].forEach(function(s) {
+            doc.text('\u2022  ' + s, rx + 2, ry);
+            ry += 3.3;
+          });
+
+          ry += 2;
+
+          /* Lingue */
+          doc.setFontSize(8.5);
+          doc.setFont('helvetica', 'bold');
+          doc.setTextColor.apply(doc, gold);
+          doc.text('LINGUE', rx, ry);
+          ry += 1.2;
+          doc.line(rx, ry, rx + colRW, ry);
+          ry += 3.8;
+
+          doc.setFontSize(7.4);
+          doc.setFont('helvetica', 'bold');
+          doc.setTextColor.apply(doc, txtDark);
+          doc.text('Italiano', rx, ry);
+          doc.setFont('helvetica', 'normal');
+          doc.setTextColor.apply(doc, gray);
+          doc.text('\u2014 Madrelingua', rx + 17, ry);
+          ry += 3.8;
+          doc.setFont('helvetica', 'bold');
+          doc.setTextColor.apply(doc, txtDark);
+          doc.text('Inglese', rx, ry);
+          doc.setFont('helvetica', 'normal');
+          doc.setTextColor.apply(doc, gray);
+          doc.text('\u2014 B1', rx + 17, ry);
+
+          ry += 5.5;
+
+          /* Interessi */
+          doc.setFontSize(8.5);
+          doc.setFont('helvetica', 'bold');
+          doc.setTextColor.apply(doc, gold);
+          doc.text('INTERESSI', rx, ry);
+          ry += 1.2;
+          doc.line(rx, ry, rx + colRW, ry);
+          ry += 3.8;
+
+          doc.setFontSize(7.2);
+          doc.setTextColor.apply(doc, gray);
+          doc.text('Informatica, Networking, Fibra Ottica,', rx, ry);
+          ry += 3;
+          doc.text('Motorsport, Videogiochi, Lettura', rx, ry);
+
+          /* Salva */
+          doc.save('Curriculum_Nicola_De_Cristofaro.pdf');
+          loader.classList.remove('active');
+          showToast('PDF scaricato con successo!', 'fa-check-circle');
+
+        } catch (err) {
+          loader.classList.remove('active');
+          console.error('Errore PDF:', err);
+          showToast('Errore nella generazione del PDF.', 'fa-exclamation-triangle');
+        }
+      }, 200);
+    }
+
+    /* ==============================================
+       UTILITÀ
+       ============================================== */
+    function copyEmail() {
+      navigator.clipboard.writeText('nicoladecristofaro@hotmail.it').then(function() {
+        showToast('Email copiata negli appunti!', 'fa-copy');
+      }).catch(function() { showToast('nicoladecristofaro@hotmail.it', 'fa-envelope'); });
+    }
+
+    function showToast(m, i) {
+      var t = document.getElementById('toast');
+      t.innerHTML = '<i class="fas ' + (i || 'fa-check-circle') + '" style="color:var(--accent);flex-shrink:0;"></i> <span>' + m + '</span>';
+      t.classList.add('show');
+      clearTimeout(t._tid);
+      t._tid = setTimeout(function() { t.classList.remove('show'); }, 5000);
+    }
+
+    /* ==============================================
+       CURSORE (solo desktop)
+       ============================================== */
+    if (window.matchMedia('(pointer: fine)').matches && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      var cursor = document.createElement('div');
+      cursor.style.cssText = 'position:fixed;width:18px;height:18px;border-radius:50%;border:2px solid var(--accent);pointer-events:none;z-index:9999;transition:transform 0.15s ease,opacity 0.15s ease;transform:translate(-50%,-50%);mix-blend-mode:difference;opacity:0;';
+      document.body.appendChild(cursor);
+      var dot = document.createElement('div');
+      dot.style.cssText = 'position:fixed;width:4px;height:4px;border-radius:50%;background:var(--accent);pointer-events:none;z-index:9999;transform:translate(-50%,-50%);opacity:0;transition:opacity 0.15s ease;';
+      document.body.appendChild(dot);
+      var mx = 0, my = 0, cx = 0, cy = 0;
+      document.addEventListener('mousemove', function(e) { mx = e.clientX; my = e.clientY; cursor.style.opacity = '1'; dot.style.opacity = '1'; });
+      document.addEventListener('mouseleave', function() { cursor.style.opacity = '0'; dot.style.opacity = '0'; });
+      document.querySelectorAll('a,button,.project-card,.tag').forEach(function(el) {
+        el.addEventListener('mouseenter', function() { cursor.style.transform = 'translate(-50%,-50%) scale(2.2)'; cursor.style.borderColor = 'var(--fiber)'; });
+        el.addEventListener('mouseleave', function() { cursor.style.transform = 'translate(-50%,-50%) scale(1)'; cursor.style.borderColor = 'var(--accent)'; });
+      });
+      (function a() { cx += (mx - cx) * 0.12; cy += (my - cy) * 0.12; cursor.style.left = cx + 'px'; cursor.style.top = cy + 'px'; dot.style.left = mx + 'px'; dot.style.top = my + 'px'; requestAnimationFrame(a); })();
+    }
+
+    /* ==============================================
+       PARTICELLE
+       ============================================== */
+    (function() {
+      var c = document.createElement('canvas');
+      c.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none;opacity:0.35;';
+      c.setAttribute('aria-hidden', 'true');
+      document.body.insertBefore(c, document.body.firstChild);
+      var ctx = c.getContext('2d');
+      var pts = [], N = 35;
+      function resize() { c.width = window.innerWidth; c.height = window.innerHeight; }
+      resize(); window.addEventListener('resize', resize);
+      for (var i = 0; i < N; i++) pts.push({ x: Math.random() * window.innerWidth, y: Math.random() * window.innerHeight, r: Math.random() * 1.5 + 0.5, vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3, col: Math.random() > 0.3 ? '200,165,92' : '0,212,170', a: Math.random() * 0.5 + 0.2 });
+      function draw() {
+        ctx.clearRect(0, 0, c.width, c.height);
+        pts.forEach(function(p) {
+          p.x += p.vx; p.y += p.vy;
+          if (p.x < -10) p.x = c.width + 10; if (p.x > c.width + 10) p.x = -10;
+          if (p.y < -10) p.y = c.height + 10; if (p.y > c.height + 10) p.y = -10;
+          ctx.beginPath(); ctx.arc(p.x, p.y, Math.max(0.1, p.r), 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(' + p.col + ',' + p.a + ')'; ctx.fill();
+        });
+        for (var i = 0; i < pts.length; i++) for (var j = i + 1; j < pts.length; j++) {
+          var dx = pts[i].x - pts[j].x, dy = pts[i].y - pts[j].y, d = Math.sqrt(dx * dx + dy * dy);
+          if (d < 140) { ctx.beginPath(); ctx.moveTo(pts[i].x, pts[i].y); ctx.lineTo(pts[j].x, pts[j].y); ctx.strokeStyle = 'rgba(200,165,92,' + (0.07 * (1 - d / 140)) + ')'; ctx.lineWidth = 0.5; ctx.stroke(); }
+        }
+        requestAnimationFrame(draw);
+      }
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) draw();
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CV Admin (locale)</title>
+  <style>
+    :root{--bg:#0c0c0c;--card:#181818;--border:#252525;--fg:#f0ece4;--muted:#8a8580;--accent:#c8a55c;}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--fg);}
+    .wrap{max-width:1000px;margin:0 auto;padding:28px 18px 60px;}
+    .row{display:flex;gap:14px;flex-wrap:wrap;align-items:center;}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;}
+    label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px;}
+    select,input,textarea,button{font:inherit;}
+    select,input,textarea{width:100%;background:#0f0f0f;color:var(--fg);border:1px solid var(--border);border-radius:12px;padding:10px 12px;outline:none;}
+    textarea{min-height:320px;resize:vertical;line-height:1.55;}
+    button{background:var(--accent);color:#0c0c0c;border:0;border-radius:999px;padding:10px 16px;font-weight:700;cursor:pointer;}
+    button.secondary{background:transparent;color:var(--fg);border:1px solid var(--border);}
+    button:disabled{opacity:0.5;cursor:not-allowed;}
+    .status{margin-top:12px;color:var(--muted);font-size:13px;white-space:pre-wrap;}
+    .files{margin-top:10px;color:var(--muted);font-size:13px;}
+    .files code{color:var(--fg);}
+    a{color:var(--accent);text-decoration:none;}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="row" style="justify-content:space-between;">
+        <div>
+          <div style="font-weight:800;font-size:18px;letter-spacing:-0.01em;">CV Admin (solo locale)</div>
+          <div style="color:var(--muted);font-size:13px;margin-top:6px;">Apri il CV: <a href="/cv" target="_blank" rel="noopener">/cv</a></div>
+        </div>
+        <div class="row">
+          <button class="secondary" id="btn-preview">Apri CV</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="height:14px"></div>
+
+    <div class="card">
+      <div class="row">
+        <div style="flex:1;min-width:240px;">
+          <label>Progetto</label>
+          <select id="projectId">
+            <option value="multi-plesso">multi-plesso</option>
+            <option value="fesr-pon">fesr-pon</option>
+            <option value="ad-radius">ad-radius</option>
+            <option value="backup-dr">backup-dr</option>
+          </select>
+        </div>
+        <div style="flex:1;min-width:240px;">
+          <label>Messaggio commit (opzionale)</label>
+          <input id="commitMsg" placeholder="update articles" />
+        </div>
+      </div>
+
+      <div style="height:12px"></div>
+
+      <label>Articolo (testo puro, usa doppio invio per paragrafi)</label>
+      <textarea id="article" placeholder="Incolla qui il testo..."></textarea>
+
+      <div style="height:12px"></div>
+
+      <div class="row">
+        <div style="flex:1;min-width:260px;">
+          <label>Immagini (verranno salvate in assets/articles/&lt;projectId&gt;/ )</label>
+          <input id="images" type="file" multiple accept="image/*" />
+        </div>
+        <div class="row" style="align-items:flex-end;">
+          <button id="btn-save">Salva articolo</button>
+          <button id="btn-upload" class="secondary">Carica immagini</button>
+          <button id="btn-publish">Pubblica su GitHub</button>
+        </div>
+      </div>
+
+      <div class="files" id="files"></div>
+      <div class="status" id="status"></div>
+    </div>
+  </div>
+
+<script>
+  const el = (id) => document.getElementById(id);
+  const status = (t) => { el('status').textContent = t || ''; };
+  const setBusy = (busy) => {
+    ['btn-save','btn-upload','btn-publish','btn-preview'].forEach(id => el(id).disabled = !!busy);
+  };
+
+  el('btn-preview').addEventListener('click', () => window.open('/cv','_blank'));
+
+  async function postJson(url, data) {
+    const r = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(data) });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok || !j.ok) throw new Error(j.error || ('Errore ' + r.status));
+    return j;
+  }
+
+  el('btn-save').addEventListener('click', async () => {
+    try {
+      setBusy(true);
+      status('Salvataggio articolo...');
+      await postJson('/api/save-article', { projectId: el('projectId').value, article: el('article').value });
+      status('OK: articolo salvato in Curriculum.html');
+    } catch (e) {
+      status('ERRORE: ' + e.message);
+    } finally {
+      setBusy(false);
+    }
+  });
+
+  el('btn-upload').addEventListener('click', async () => {
+    try {
+      const files = el('images').files;
+      if (!files || !files.length) { status('Seleziona prima delle immagini.'); return; }
+
+      setBusy(true);
+      status('Upload immagini...');
+
+      const fd = new FormData();
+      fd.append('projectId', el('projectId').value);
+      for (const f of files) fd.append('images', f);
+
+      const r = await fetch('/api/upload-images', { method:'POST', body: fd });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok || !j.ok) throw new Error(j.error || ('Errore ' + r.status));
+
+      const list = (j.files || []).map(x => x.path);
+      el('files').innerHTML = list.length
+        ? 'Salvate: <br>' + list.map(p => '<code>' + p + '</code>').join('<br>')
+        : '';
+
+      status('OK: immagini caricate.');
+    } catch (e) {
+      status('ERRORE: ' + e.message);
+    } finally {
+      setBusy(false);
+    }
+  });
+
+  el('btn-publish').addEventListener('click', async () => {
+    try {
+      setBusy(true);
+      status('Pubblicazione (git add/commit/push)...');
+      await postJson('/api/publish', { message: el('commitMsg').value || 'update cv' });
+      status('OK: push completato. GitHub Pages si aggiorna in 10-60 secondi.');
+    } catch (e) {
+      status('ERRORE: ' + e.message + "\n\nNota: devi prima inizializzare la repo git e collegarla a GitHub Desktop.");
+    } finally {
+      setBusy(false);
+    }
+  });
+</script>
+</body>
+</html>
