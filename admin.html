@@ -7,87 +7,259 @@
   <style>
     :root{--bg:#0c0c0c;--card:#181818;--border:#252525;--fg:#f0ece4;--muted:#8a8580;--accent:#c8a55c;}
     body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--fg);}
-    .wrap{max-width:1000px;margin:0 auto;padding:28px 18px 60px;}
+    .wrap{max-width:1120px;margin:0 auto;padding:24px 18px 70px;}
     .row{display:flex;gap:14px;flex-wrap:wrap;align-items:center;}
-    .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;}
+    .card-title{font-weight:900;font-size:14px;letter-spacing:-0.01em;}
+    .card-sub{color:var(--muted);font-size:13px;margin-top:6px;line-height:1.35;}
     label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px;}
     select,input,textarea,button{font:inherit;}
     select,input,textarea{width:100%;background:#0f0f0f;color:var(--fg);border:1px solid var(--border);border-radius:12px;padding:10px 12px;outline:none;}
-    textarea{min-height:320px;resize:vertical;line-height:1.55;}
-    button{background:var(--accent);color:#0c0c0c;border:0;border-radius:999px;padding:10px 16px;font-weight:700;cursor:pointer;}
-    button.secondary{background:transparent;color:var(--fg);border:1px solid var(--border);}
+    textarea{min-height:340px;resize:vertical;line-height:1.55;}
+    button{background:var(--accent);color:#0c0c0c;border:0;border-radius:999px;padding:10px 16px;font-weight:800;cursor:pointer;}
+    button.secondary{background:transparent;color:var(--fg);border:1px solid var(--border);font-weight:700;}
+    button.ghost{background:rgba(255,255,255,0.04);color:var(--fg);border:1px solid rgba(255,255,255,0.08);font-weight:700;}
     button:disabled{opacity:0.5;cursor:not-allowed;}
     .status{margin-top:12px;color:var(--muted);font-size:13px;white-space:pre-wrap;}
     .files{margin-top:10px;color:var(--muted);font-size:13px;}
     .files code{color:var(--fg);}
     a{color:var(--accent);text-decoration:none;}
+    .topbar{display:flex;gap:14px;align-items:center;justify-content:space-between;}
+    .brand{display:flex;flex-direction:column;gap:4px;}
+    .brand h1{margin:0;font-size:18px;letter-spacing:-0.02em;}
+    .tabs{display:flex;gap:8px;flex-wrap:wrap;}
+    .tab{padding:10px 14px;border-radius:999px;border:1px solid var(--border);background:transparent;color:var(--fg);font-weight:800;cursor:pointer;}
+    .tab.active{background:rgba(200,165,92,0.14);border-color:rgba(200,165,92,0.35);}
+    .view{display:none;}
+    .view.active{display:block;}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+    .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+    .muted{color:var(--muted);}
+    .pill{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;border:1px solid var(--border);background:rgba(255,255,255,0.03);color:var(--muted);font-size:12px;font-weight:700;}
+    .danger{border-color:rgba(255,80,80,0.25);}
+    button.danger{background:rgba(255,80,80,0.14);border:1px solid rgba(255,80,80,0.25);color:#ffd9d9;}
+    .help{color:var(--muted);font-size:12px;line-height:1.35;margin-top:6px;}
+    .pm-card{border:1px solid var(--border);border-radius:16px;padding:12px;background:#0f0f0f;}
+    .pm-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+    .pm-id{font-weight:900;font-size:13px;color:var(--fg);}
+    .pm-title{font-size:12px;color:var(--muted);max-width:720px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .pm-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+    .pm-grid{display:grid;grid-template-columns:repeat(4,minmax(160px,1fr));gap:10px;margin-top:10px;}
+    .pm-grid .field label{margin:0 0 6px;}
+    .pm-grid .field input,.pm-grid .field select{padding:8px 10px;border-radius:12px;}
+    .pm-toggles{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-top:10px;}
+    .pm-toggles label{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px;margin:0;}
+    .pm-editor{display:none;margin-top:10px;border:1px solid var(--border);border-radius:14px;padding:12px;background:rgba(0,0,0,0.18);}
+    .pm-editor-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    @media(max-width:980px){.pm-grid{grid-template-columns:repeat(2,minmax(160px,1fr));}.pm-title{max-width:100%;}}
+    @media(max-width:560px){.pm-grid{grid-template-columns:1fr;}.pm-editor-grid{grid-template-columns:1fr;}.pm-title{white-space:normal;}}
+    details{border:1px solid var(--border);border-radius:16px;background:rgba(15,15,15,0.45);}
+    details > summary{list-style:none;cursor:pointer;padding:14px 16px;font-weight:900;}
+    details > summary::-webkit-details-marker{display:none;}
+    details .details-body{padding:0 16px 16px;}
+    @media(max-width:900px){.grid-2,.grid-3{grid-template-columns:1fr;}}
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="card">
-      <div class="row" style="justify-content:space-between;">
-        <div>
-          <div style="font-weight:800;font-size:18px;letter-spacing:-0.01em;">CV Admin (solo locale)</div>
-          <div style="color:var(--muted);font-size:13px;margin-top:6px;">Apri il CV: <a href="/cv" target="_blank" rel="noopener">/cv</a></div>
+      <div class="topbar">
+        <div class="brand">
+          <h1>CV Admin (locale)</h1>
+          <div class="card-sub">Apri il CV: <a href="/cv" target="_blank" rel="noopener">/cv</a></div>
         </div>
         <div class="row">
           <button class="secondary" id="btn-preview">Apri CV</button>
         </div>
       </div>
+      <div style="height:12px"></div>
+      <div class="tabs" role="tablist" aria-label="Sezioni admin">
+        <button class="tab active" type="button" data-view="view-article">Articolo</button>
+        <button class="tab" type="button" data-view="view-gallery">Gallery</button>
+        <button class="tab" type="button" data-view="view-projects">Progetti</button>
+      </div>
     </div>
 
     <div style="height:14px"></div>
 
-    <div class="card">
-      <div class="row">
-        <div style="flex:1;min-width:240px;">
-          <label>Progetto</label>
-          <select id="projectId">
-            <option value="multi-plesso">multi-plesso</option>
-            <option value="fesr-pon">fesr-pon</option>
-            <option value="ad-radius">ad-radius</option>
-            <option value="backup-dr">backup-dr</option>
-          </select>
+    <div class="view active" id="view-article">
+      <div class="card">
+        <div class="grid-2">
+          <div>
+            <label>Progetto</label>
+            <select id="projectId"></select>
+          </div>
+          <div>
+            <label>Messaggio commit (opzionale)</label>
+            <input id="commitMsg" placeholder="update articles" />
+          </div>
         </div>
-        <div style="flex:1;min-width:240px;">
-          <label>Messaggio commit (opzionale)</label>
-          <input id="commitMsg" placeholder="update articles" />
+
+        <div style="height:12px"></div>
+
+        <label>Articolo</label>
+        <textarea id="article" placeholder="Incolla qui il testo..."></textarea>
+
+        <div style="height:12px"></div>
+
+        <div class="row" style="justify-content:space-between;">
+          <div class="row">
+            <button id="btn-save">Salva</button>
+            <button id="btn-delete-article" class="danger">Elimina articolo</button>
+            <button id="btn-publish" class="secondary">Pubblica su GitHub</button>
+          </div>
+          <div class="muted" style="font-size:12px;">Suggerimento: doppio invio = nuovo paragrafo</div>
         </div>
+
+        <div class="status" id="status"></div>
       </div>
 
-      <div style="height:12px"></div>
+      <div style="height:14px"></div>
 
-      <label>Articolo (testo puro, usa doppio invio per paragrafi)</label>
-      <textarea id="article" placeholder="Incolla qui il testo..."></textarea>
-
-      <div style="height:12px"></div>
-
-      <div class="row">
-        <div style="flex:1;min-width:260px;">
-          <label>Immagini (verranno salvate in assets/articles/&lt;projectId&gt;/ )</label>
-          <input id="images" type="file" multiple accept="image/*" />
+      <details>
+        <summary>Upload immagini (opzionale)</summary>
+        <div class="details-body">
+          <div class="grid-2">
+            <div>
+              <label>Immagini (salvate in assets/articles/&lt;projectId&gt;/)</label>
+              <input id="images" type="file" multiple accept="image/*" />
+              <div class="files" id="files"></div>
+            </div>
+            <div>
+              <label>Opzioni</label>
+              <label style="display:flex;align-items:center;gap:10px;color:var(--fg);font-size:13px;margin:0;">
+                <input type="checkbox" id="alsoGallery" style="width:auto;" checked> Aggiungi alla galleria (slider)
+              </label>
+              <div style="height:8px"></div>
+              <label style="display:flex;align-items:center;gap:10px;color:var(--fg);font-size:13px;margin:0;">
+                <input type="checkbox" id="alsoArticle" style="width:auto;"> Inserisci nel testo (placeholder [[img:...]])
+              </label>
+              <div style="height:12px"></div>
+              <div class="row">
+                <button id="btn-upload" class="secondary">Carica immagini</button>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="row" style="align-items:flex-end;">
-          <button id="btn-save">Salva articolo</button>
-          <button id="btn-upload" class="secondary">Carica immagini</button>
-          <button id="btn-publish">Pubblica su GitHub</button>
+      </details>
+    </div>
+
+    <div class="view" id="view-gallery">
+      <div class="card">
+        <div class="card-title">Gallery progetto (slider)</div>
+        <div class="card-sub">Gestisci le immagini che compaiono nello slider a sinistra (aggiungi/rimuovi 1 ad 1).</div>
+        <div style="height:12px"></div>
+        <div class="row">
+          <button id="btn-refresh-gallery" class="secondary">Aggiorna lista</button>
+          <button id="btn-clear-gallery" class="secondary">Svuota gallery</button>
         </div>
+        <div style="height:10px"></div>
+        <div id="galleryList" style="display:flex;flex-direction:column;gap:10px;"></div>
+        <div class="status" id="galleryStatus"></div>
+      </div>
+    </div>
+
+    <div class="view" id="view-projects">
+      <div class="card">
+        <div class="card-title">Ordine / Visibilità</div>
+        <div class="card-sub">Imposta l’ordine di visualizzazione (più basso = prima) e il badge NEW. Puoi anche nascondere un progetto (disabled).</div>
+        <div style="height:12px"></div>
+        <div class="row">
+          <button id="btn-refresh-projects" class="secondary">Aggiorna lista</button>
+        </div>
+        <div style="height:10px"></div>
+        <div id="projectsMeta" style="display:flex;flex-direction:column;gap:10px;"></div>
+        <div class="status" id="projectsMetaStatus"></div>
       </div>
 
-      <div class="files" id="files"></div>
-      <div class="status" id="status"></div>
+      <div style="height:14px"></div>
+
+      <details>
+        <summary>Crea nuovo progetto (avanzato)</summary>
+        <div class="details-body">
+          <div class="pill">Campi minimi: <strong style="color:var(--fg);">ID</strong> e <strong style="color:var(--fg);">Titolo</strong>. Tag consigliati per icone.</div>
+          <div class="help">Se qualcosa è sbagliato, qui sotto vedrai un messaggio chiaro (così evitiamo di “rompere” il CV).</div>
+          <div class="grid-2">
+            <div>
+              <label>Project ID (solo lettere/numeri e -)</label>
+              <input id="newId" placeholder="es: wifi-campus" />
+            </div>
+            <div>
+              <label>Titolo</label>
+              <input id="newTitle" placeholder="Titolo progetto" />
+            </div>
+          </div>
+          <div style="height:10px"></div>
+          <label>Descrizione (breve, per la card)</label>
+          <input id="newDesc" placeholder="Una riga di contesto sul progetto" />
+          <div style="height:10px"></div>
+          <div class="grid-3">
+            <div>
+              <label>Dove appare (Filtro)</label>
+              <select id="newCategory">
+                <option value="infra">Infrastruttura</option>
+                <option value="server">Server / Sicurezza</option>
+                <option value="backup">Backup / DR</option>
+              </select>
+            </div>
+            <div>
+              <label>Stile badge (colore)</label>
+              <select id="newBadgeClass">
+                <option value="infra">Infrastruttura (oro)</option>
+                <option value="auth">Auth/Security (verde)</option>
+                <option value="backup">Backup (azzurro)</option>
+              </select>
+            </div>
+            <div>
+              <label>Badge (testo visibile sulla card)</label>
+              <input id="newBadge" placeholder="Es: Infrastruttura Rete" />
+            </div>
+          </div>
+          <div style="height:10px"></div>
+          <label>Tag (separati da virgola) — usati anche per le iconcine nell’header</label>
+          <input id="newTags" placeholder="Es: Ubiquiti airMAX, VLAN, Firewall" />
+          <div style="height:12px"></div>
+          <div class="row">
+            <button id="btn-create">Crea progetto</button>
+          </div>
+          <div class="status" id="createStatus"></div>
+        </div>
+      </details>
     </div>
   </div>
 
 <script>
   const el = (id) => document.getElementById(id);
   const status = (t) => { el('status').textContent = t || ''; };
+  const cstatus = (t) => { el('createStatus').textContent = t || ''; };
+  const gstatus = (t) => { el('galleryStatus').textContent = t || ''; };
+  const pmstatus = (t) => { el('projectsMetaStatus').textContent = t || ''; };
   const setBusy = (busy) => {
-    ['btn-save','btn-upload','btn-publish','btn-preview'].forEach(id => el(id).disabled = !!busy);
+    ['btn-save','btn-upload','btn-publish','btn-preview','btn-create','btn-delete-article'].forEach(id => {
+      const n = el(id);
+      if (n) n.disabled = !!busy;
+    });
   };
 
+  function validateNewProjectForm() {
+    const id = (el('newId').value || '').trim();
+    const title = (el('newTitle').value || '').trim();
+    if (!id) return 'Inserisci un Project ID.';
+    if (!/^[a-z0-9-]+$/i.test(id)) return 'Project ID non valido: usa solo lettere, numeri e trattini (-).';
+    if (!title) return 'Inserisci un Titolo.';
+    return '';
+  }
+
   el('btn-preview').addEventListener('click', () => window.open('/cv','_blank'));
+
+  Array.prototype.slice.call(document.querySelectorAll('.tab')).forEach(function(t) {
+    t.addEventListener('click', function() {
+      Array.prototype.slice.call(document.querySelectorAll('.tab')).forEach(function(x) { x.classList.remove('active'); });
+      t.classList.add('active');
+      var v = t.getAttribute('data-view');
+      Array.prototype.slice.call(document.querySelectorAll('.view')).forEach(function(p) { p.classList.toggle('active', p.id === v); });
+    });
+  });
 
   async function postJson(url, data) {
     const r = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(data) });
@@ -96,12 +268,420 @@
     return j;
   }
 
+  async function loadProjects() {
+    const r = await fetch('/api/projects');
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok || !j.ok) throw new Error(j.error || ('Errore ' + r.status));
+    const ids = j.ids || [];
+    const sel = el('projectId');
+    const current = sel.value;
+    sel.innerHTML = '';
+    ids.forEach((id) => {
+      const o = document.createElement('option');
+      o.value = id;
+      o.textContent = id;
+      sel.appendChild(o);
+    });
+    if (current && ids.includes(current)) sel.value = current;
+  }
+
+  el('btn-refresh-projects').addEventListener('click', async () => {
+    try {
+      setBusy(true);
+      pmstatus('Aggiornamento...');
+      renderProjectsMeta(await loadProjectsMeta());
+      pmstatus('OK.');
+    } catch (e) {
+      pmstatus('ERRORE: ' + e.message);
+    } finally {
+      setBusy(false);
+    }
+  });
+
+  async function loadArticle(projectId) {
+    const r = await fetch('/api/article?projectId=' + encodeURIComponent(projectId));
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok || !j.ok) throw new Error(j.error || ('Errore ' + r.status));
+    return j.article || '';
+  }
+
+  async function loadGallery(projectId) {
+    const r = await fetch('/api/gallery?projectId=' + encodeURIComponent(projectId));
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok || !j.ok) throw new Error(j.error || ('Errore ' + r.status));
+    return j.gallery || [];
+  }
+
+  async function loadProjectsMeta() {
+    const r = await fetch('/api/projects-meta');
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok || !j.ok) throw new Error(j.error || ('Errore ' + r.status));
+    return j.projects || [];
+  }
+
+  function renderProjectsMeta(list) {
+    const wrap = el('projectsMeta');
+    wrap.innerHTML = '';
+    list.sort((a, b) => (a.order ?? 9999) - (b.order ?? 9999));
+    list.forEach((p) => {
+      const card = document.createElement('div');
+      card.className = 'pm-card';
+
+      const top = document.createElement('div');
+      top.className = 'pm-top';
+
+      const left = document.createElement('div');
+      const id = document.createElement('div');
+      id.className = 'pm-id';
+      id.textContent = p.id;
+      const title = document.createElement('div');
+      title.className = 'pm-title';
+      title.textContent = p.title || '';
+      left.appendChild(id);
+      left.appendChild(title);
+
+      const actions = document.createElement('div');
+      actions.className = 'pm-actions';
+
+      const edit = document.createElement('button');
+      edit.className = 'secondary';
+      edit.textContent = 'Modifica contenuti';
+
+      const btn = document.createElement('button');
+      btn.className = 'secondary';
+      btn.textContent = 'Salva impostazioni';
+      btn.addEventListener('click', async () => {
+        try {
+          setBusy(true);
+          pmstatus('Salvataggio...');
+          await postJson('/api/update-project-settings', {
+            projectId: p.id,
+            order: order.value,
+            isNew: isNew.checked,
+            disabled: disabled.checked
+          });
+          await postJson('/api/update-project-details', {
+            projectId: p.id,
+            category: category.value,
+            badge: badge.value,
+            badgeClass: badgeClass.value
+          });
+          pmstatus('OK.');
+        } catch (e) {
+          pmstatus('ERRORE: ' + e.message);
+        } finally {
+          setBusy(false);
+        }
+      });
+
+      const del = document.createElement('button');
+      del.className = 'danger';
+      del.textContent = 'Elimina progetto';
+      del.addEventListener('click', async () => {
+        if (!confirm('Eliminare definitivamente il progetto "' + p.id + '"?')) return;
+        try {
+          setBusy(true);
+          pmstatus('Eliminazione...');
+          await postJson('/api/delete-project', { projectId: p.id });
+          await loadProjects();
+          renderProjectsMeta(await loadProjectsMeta());
+          pmstatus('OK: eliminato.');
+        } catch (e) {
+          pmstatus('ERRORE: ' + e.message);
+        } finally {
+          setBusy(false);
+        }
+      });
+
+      actions.appendChild(edit);
+      actions.appendChild(btn);
+      actions.appendChild(del);
+
+      top.appendChild(left);
+      top.appendChild(actions);
+
+      const order = document.createElement('input');
+      order.value = (p.order ?? '');
+      order.placeholder = 'es: 1';
+
+      const category = document.createElement('select');
+      category.innerHTML = '<option value="infra">Infrastruttura</option><option value="server">Server/Sicurezza</option><option value="backup">Backup/DR</option>';
+      category.value = p.category || 'infra';
+
+      const badge = document.createElement('input');
+      badge.value = p.badge || '';
+      badge.placeholder = 'Es: Infrastruttura Rete';
+
+      const badgeClass = document.createElement('select');
+      badgeClass.innerHTML = '<option value="infra">Oro</option><option value="auth">Verde</option><option value="backup">Azzurro</option>';
+      badgeClass.value = p.badgeClass || 'infra';
+
+      const isNew = document.createElement('input');
+      isNew.type = 'checkbox';
+      isNew.checked = !!p.isNew;
+
+      const disabled = document.createElement('input');
+      disabled.type = 'checkbox';
+      disabled.checked = !!p.disabled;
+
+      const settings = document.createElement('div');
+      settings.className = 'pm-grid';
+      const field = (labelText, node) => {
+        const d = document.createElement('div');
+        d.className = 'field';
+        const l = document.createElement('label');
+        l.textContent = labelText;
+        d.appendChild(l);
+        d.appendChild(node);
+        return d;
+      };
+      settings.appendChild(field('Ordine', order));
+      settings.appendChild(field('Filtro (categoria)', category));
+      settings.appendChild(field('Badge (testo)', badge));
+      settings.appendChild(field('Stile badge', badgeClass));
+
+      const toggles = document.createElement('div');
+      toggles.className = 'pm-toggles';
+      const newWrap = document.createElement('label');
+      newWrap.appendChild(isNew);
+      newWrap.appendChild(document.createTextNode('Mostra NEW'));
+      const disWrap = document.createElement('label');
+      disWrap.appendChild(disabled);
+      disWrap.appendChild(document.createTextNode('Nascondi (disabled)'));
+      toggles.appendChild(newWrap);
+      toggles.appendChild(disWrap);
+
+      // Inline editor panel
+      const panel = document.createElement('div');
+      panel.className = 'pm-editor';
+
+      const grid = document.createElement('div');
+      grid.className = 'pm-editor-grid';
+
+      const inTitle = document.createElement('input');
+      inTitle.value = p.title || '';
+      const inDesc = document.createElement('input');
+      inDesc.value = p.desc || '';
+      const inTags = document.createElement('input');
+      inTags.value = (p.tags || []).join(', ');
+      inTags.placeholder = 'Tag separati da virgola';
+
+      const regen = document.createElement('label');
+      regen.style.display = 'flex';
+      regen.style.alignItems = 'center';
+      regen.style.gap = '10px';
+      regen.style.color = 'var(--muted)';
+      regen.style.fontSize = '12px';
+      const regenCb = document.createElement('input');
+      regenCb.type = 'checkbox';
+      regenCb.checked = true;
+      regen.appendChild(regenCb);
+      regen.appendChild(document.createTextNode('Rigenera header (icone/sfondo) dai tag'));
+
+      const lab1 = document.createElement('div');
+      lab1.innerHTML = '<div class="muted" style="font-size:12px;margin-bottom:6px;">Titolo</div>';
+      lab1.appendChild(inTitle);
+      const lab2 = document.createElement('div');
+      lab2.innerHTML = '<div class="muted" style="font-size:12px;margin-bottom:6px;">Descrizione (card)</div>';
+      lab2.appendChild(inDesc);
+      const lab3 = document.createElement('div');
+      lab3.style.gridColumn = '1 / -1';
+      lab3.innerHTML = '<div class="muted" style="font-size:12px;margin-bottom:6px;">Tag</div>';
+      lab3.appendChild(inTags);
+
+      grid.appendChild(lab1);
+      grid.appendChild(lab2);
+      grid.appendChild(lab3);
+
+      const editorActions = document.createElement('div');
+      editorActions.style.display = 'flex';
+      editorActions.style.gap = '10px';
+      editorActions.style.alignItems = 'center';
+      editorActions.style.justifyContent = 'space-between';
+      editorActions.style.marginTop = '10px';
+
+      const saveCore = document.createElement('button');
+      saveCore.className = 'secondary';
+      saveCore.textContent = 'Salva contenuti';
+      saveCore.addEventListener('click', async () => {
+        try {
+          setBusy(true);
+          pmstatus('Salvataggio progetto...');
+          await postJson('/api/update-project-core', {
+            projectId: p.id,
+            title: inTitle.value,
+            desc: inDesc.value,
+            tags: inTags.value,
+            regenHeaderHTML: regenCb.checked
+          });
+          await loadProjects();
+          renderProjectsMeta(await loadProjectsMeta());
+          pmstatus('OK.');
+        } catch (e) {
+          pmstatus('ERRORE: ' + e.message);
+        } finally {
+          setBusy(false);
+        }
+      });
+
+      const close = document.createElement('button');
+      close.className = 'secondary';
+      close.textContent = 'Chiudi';
+      close.addEventListener('click', () => { panel.style.display = 'none'; });
+
+      editorActions.appendChild(regen);
+      editorActions.appendChild(saveCore);
+      editorActions.appendChild(close);
+
+      panel.appendChild(grid);
+      panel.appendChild(editorActions);
+      card.appendChild(panel);
+
+      edit.addEventListener('click', () => {
+        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+      });
+
+      card.appendChild(top);
+      card.appendChild(settings);
+      card.appendChild(toggles);
+      wrap.appendChild(card);
+    });
+  }
+
+  function renderGalleryList(paths) {
+    const wrap = el('galleryList');
+    wrap.innerHTML = '';
+    if (!paths.length) {
+      wrap.innerHTML = '<div style="color:var(--muted);font-size:13px;">Nessuna immagine in gallery.</div>';
+      return;
+    }
+    paths.forEach((p) => {
+      const row = document.createElement('div');
+      row.style.display = 'flex';
+      row.style.gap = '12px';
+      row.style.alignItems = 'center';
+      row.style.border = '1px solid var(--border)';
+      row.style.borderRadius = '14px';
+      row.style.padding = '10px';
+      row.style.background = '#0f0f0f';
+
+      const img = document.createElement('img');
+      img.src = '/' + p;
+      img.alt = '';
+      img.style.width = '92px';
+      img.style.height = '64px';
+      img.style.objectFit = 'cover';
+      img.style.borderRadius = '12px';
+      img.style.border = '1px solid var(--border)';
+
+      const code = document.createElement('div');
+      code.textContent = p;
+      code.style.flex = '1';
+      code.style.color = 'var(--muted)';
+      code.style.fontSize = '12px';
+      code.style.wordBreak = 'break-all';
+
+      const btn = document.createElement('button');
+      btn.className = 'secondary';
+      btn.textContent = 'Rimuovi';
+      btn.addEventListener('click', async () => {
+        try {
+          setBusy(true);
+          gstatus('Rimozione...');
+          await postJson('/api/remove-gallery-image', { projectId: el('projectId').value, path: p });
+          const updated = await loadGallery(el('projectId').value);
+          renderGalleryList(updated);
+          gstatus('OK: rimossa.');
+        } catch (e) {
+          gstatus('ERRORE: ' + e.message);
+        } finally {
+          setBusy(false);
+        }
+      });
+
+      row.appendChild(img);
+      row.appendChild(code);
+      row.appendChild(btn);
+      wrap.appendChild(row);
+    });
+  }
+
+  loadProjects().then(async () => {
+    try {
+      const pid = el('projectId').value;
+      if (pid) {
+        el('article').value = await loadArticle(pid);
+        renderGalleryList(await loadGallery(pid));
+      }
+      renderProjectsMeta(await loadProjectsMeta());
+    } catch (e) {
+      status('ERRORE: ' + e.message);
+    }
+  }).catch(e => status('ERRORE: ' + e.message));
+
+  el('projectId').addEventListener('change', async () => {
+    try {
+      setBusy(true);
+      status('Caricamento...');
+      const pid = el('projectId').value;
+      el('article').value = await loadArticle(pid);
+      renderGalleryList(await loadGallery(pid));
+      status('OK: articolo + gallery caricati.');
+    } catch (e) {
+      status('ERRORE: ' + e.message);
+    } finally {
+      setBusy(false);
+    }
+  });
+
+  el('btn-refresh-gallery').addEventListener('click', async () => {
+    try {
+      setBusy(true);
+      gstatus('Aggiornamento...');
+      renderGalleryList(await loadGallery(el('projectId').value));
+      gstatus('OK.');
+    } catch (e) {
+      gstatus('ERRORE: ' + e.message);
+    } finally {
+      setBusy(false);
+    }
+  });
+
+  el('btn-clear-gallery').addEventListener('click', async () => {
+    try {
+      setBusy(true);
+      gstatus('Svuotamento...');
+      await postJson('/api/set-gallery', { projectId: el('projectId').value, paths: [] });
+      renderGalleryList([]);
+      gstatus('OK: gallery svuotata.');
+    } catch (e) {
+      gstatus('ERRORE: ' + e.message);
+    } finally {
+      setBusy(false);
+    }
+  });
+
   el('btn-save').addEventListener('click', async () => {
     try {
       setBusy(true);
       status('Salvataggio articolo...');
       await postJson('/api/save-article', { projectId: el('projectId').value, article: el('article').value });
       status('OK: articolo salvato in Curriculum.html');
+    } catch (e) {
+      status('ERRORE: ' + e.message);
+    } finally {
+      setBusy(false);
+    }
+  });
+
+  el('btn-delete-article').addEventListener('click', async () => {
+    if (!confirm('Vuoi eliminare il contenuto dell\'articolo per questo progetto?')) return;
+    try {
+      setBusy(true);
+      status('Eliminazione articolo...');
+      await postJson('/api/delete-article', { projectId: el('projectId').value });
+      el('article').value = '';
+      status('OK: articolo eliminato.');
     } catch (e) {
       status('ERRORE: ' + e.message);
     } finally {
@@ -117,6 +697,12 @@
       setBusy(true);
       status('Upload immagini...');
 
+      // Carichiamo l'articolo SOLO se dobbiamo modificarlo (placeholder nel testo)
+      if (el('alsoArticle').checked) {
+        const currentArticle = await loadArticle(el('projectId').value);
+        el('article').value = currentArticle;
+      }
+
       const fd = new FormData();
       fd.append('projectId', el('projectId').value);
       for (const f of files) fd.append('images', f);
@@ -130,7 +716,20 @@
         ? 'Salvate: <br>' + list.map(p => '<code>' + p + '</code>').join('<br>')
         : '';
 
-      status('OK: immagini caricate.');
+      if (list.length) {
+        if (el('alsoGallery').checked) {
+          await postJson('/api/add-gallery-images', { projectId: el('projectId').value, paths: list });
+        }
+
+        if (el('alsoArticle').checked) {
+          const sep = el('article').value && !/\n\s*$/.test(el('article').value) ? '\n\n' : (el('article').value ? '\n' : '');
+          const chunk = list.map(p => `[[img:${p}]]`).join('\n\n');
+          el('article').value = (el('article').value || '') + sep + chunk + '\n';
+          await postJson('/api/save-article', { projectId: el('projectId').value, article: el('article').value });
+        }
+      }
+
+      status('OK: immagini caricate' + (el('alsoGallery').checked ? ' + galleria' : '') + (el('alsoArticle').checked ? ' + testo' : '') + '.');
     } catch (e) {
       status('ERRORE: ' + e.message);
     } finally {
@@ -146,6 +745,45 @@
       status('OK: push completato. GitHub Pages si aggiorna in 10-60 secondi.');
     } catch (e) {
       status('ERRORE: ' + e.message + "\n\nNota: devi prima inizializzare la repo git e collegarla a GitHub Desktop.");
+    } finally {
+      setBusy(false);
+    }
+  });
+
+  el('btn-create').addEventListener('click', async () => {
+    try {
+      const err = validateNewProjectForm();
+      if (err) { cstatus('ERRORE: ' + err); return; }
+
+      setBusy(true);
+      cstatus('Creazione progetto...');
+      const payload = {
+        id: el('newId').value.trim(),
+        title: el('newTitle').value.trim(),
+        desc: el('newDesc').value.trim(),
+        category: el('newCategory').value,
+        badgeClass: el('newBadgeClass').value,
+        badge: el('newBadge').value.trim(),
+        tags: el('newTags').value
+      };
+      await postJson('/api/create-project', payload);
+      await loadProjects();
+      el('projectId').value = payload.id;
+
+      // Load fresh state for the new project
+      el('article').value = await loadArticle(payload.id);
+      renderGalleryList(await loadGallery(payload.id));
+      renderProjectsMeta(await loadProjectsMeta());
+
+      // Switch to Article tab (most common next step)
+      Array.prototype.slice.call(document.querySelectorAll('.tab')).forEach(function(x) { x.classList.remove('active'); });
+      var t = document.querySelector('.tab[data-view="view-article"]');
+      if (t) t.classList.add('active');
+      Array.prototype.slice.call(document.querySelectorAll('.view')).forEach(function(p) { p.classList.toggle('active', p.id === 'view-article'); });
+
+      cstatus('OK: progetto creato. Se vuoi, ora scrivi l’articolo e salva.');
+    } catch (e) {
+      cstatus('ERRORE: ' + e.message);
     } finally {
       setBusy(false);
     }

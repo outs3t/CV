@@ -152,7 +152,8 @@
     .modal-close{width:40px;height:40px;border-radius:12px;border:1px solid rgba(255,255,255,0.10);background:rgba(12,12,12,0.35);color:var(--fg);cursor:pointer;transition:transform 0.2s ease,border-color 0.2s ease;display:flex;align-items:center;justify-content:center;}
     .modal-close:hover{transform:translateY(-1px);border-color:rgba(200,165,92,0.4);}
     .gallery-stage{flex:1;display:flex;align-items:center;justify-content:center;position:relative;padding:54px 18px 18px;}
-    .gallery-img{width:100%;height:100%;object-fit:cover;border-radius:14px;border:1px solid rgba(255,255,255,0.08);background:rgba(12,12,12,0.35);max-height:calc(88vh - 170px);}
+    .gallery-img{width:100%;height:100%;object-fit:contain;border-radius:14px;border:1px solid rgba(255,255,255,0.08);background:rgba(12,12,12,0.35);max-height:calc(88vh - 170px);opacity:1;transform:translateY(0);transition:opacity 180ms ease,transform 220ms ease;}
+    .gallery-img.is-switching{opacity:0;transform:translateY(8px);}
     .gallery-nav{position:absolute;top:50%;transform:translateY(-50%);width:46px;height:46px;border-radius:14px;border:1px solid rgba(255,255,255,0.10);background:rgba(12,12,12,0.38);color:var(--fg);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform 0.2s ease,border-color 0.2s ease,opacity 0.2s ease;}
     .gallery-nav:hover{transform:translateY(-50%) scale(1.03);border-color:rgba(200,165,92,0.4);}
     .gallery-prev{left:20px;}
@@ -165,9 +166,25 @@
     .modal-body{font-size:0.92rem;line-height:1.9;color:var(--fg-muted);overflow-wrap:anywhere;word-break:break-word;}
     .modal-body h3{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--fg);margin:18px 0 8px;}
     .modal-body p{margin:10px 0;}
+    .modal-body .article-img{width:100%;height:auto;display:block;border-radius:14px;border:1px solid rgba(255,255,255,0.10);background:rgba(12,12,12,0.25);margin:14px 0;}
+    .modal-body .article-caption{margin-top:-8px;margin-bottom:12px;font-size:0.82rem;color:rgba(240,236,228,0.70);}
     .modal-body ul{margin:10px 0 10px 18px;color:var(--fg-muted);}
     .modal-body li{margin:4px 0;}
     body.modal-open{overflow:hidden;}
+    .lightbox-overlay{position:fixed;inset:0;z-index:400;background:rgba(0,0,0,0.88);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;padding:22px;}
+    .lightbox-overlay.active{display:flex;}
+    .lightbox-panel{width:min(1280px,100%);height:min(92vh,980px);border-radius:18px;border:1px solid rgba(255,255,255,0.08);background:rgba(12,12,12,0.55);box-shadow:0 40px 160px rgba(0,0,0,0.7);overflow:hidden;display:flex;flex-direction:column;}
+    .lightbox-topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.08);}
+    .lightbox-title{font-family:'Playfair Display',serif;font-weight:800;font-size:0.95rem;color:var(--fg);opacity:0.95;}
+    .lightbox-actions{display:flex;gap:8px;align-items:center;}
+    .lightbox-btn{height:40px;min-width:40px;padding:0 12px;border-radius:12px;border:1px solid rgba(255,255,255,0.10);background:rgba(12,12,12,0.35);color:var(--fg);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:transform 0.2s ease,border-color 0.2s ease;}
+    .lightbox-btn:hover{transform:translateY(-1px);border-color:rgba(200,165,92,0.4);}
+    .lightbox-stage{position:relative;flex:1;display:flex;align-items:center;justify-content:center;padding:16px;}
+    .lightbox-img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;transform-origin:center center;}
+    .lightbox-nav{position:absolute;top:50%;transform:translateY(-50%);width:48px;height:48px;border-radius:16px;border:1px solid rgba(255,255,255,0.10);background:rgba(12,12,12,0.38);color:var(--fg);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform 0.2s ease,border-color 0.2s ease,opacity 0.2s ease;}
+    .lightbox-nav:hover{transform:translateY(-50%) scale(1.03);border-color:rgba(200,165,92,0.4);}
+    .lightbox-prev{left:14px;}
+    .lightbox-next{right:14px;}
     .modal-right::-webkit-scrollbar{width:10px;}
     .modal-right::-webkit-scrollbar-track{background:rgba(12,12,12,0.25);border-left:1px solid rgba(255,255,255,0.04);}
     .modal-right::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.12);border-radius:10px;border:2px solid rgba(12,12,12,0.35);}
@@ -402,6 +419,25 @@
     </div>
   </div>
 
+  <div class="lightbox-overlay" id="lightbox" aria-hidden="true">
+    <div class="lightbox-panel" role="dialog" aria-modal="true" aria-label="Immagine">
+      <div class="lightbox-topbar">
+        <div class="lightbox-title" id="lightbox-title">Immagine</div>
+        <div class="lightbox-actions">
+          <button class="lightbox-btn" id="lb-zoom-out" aria-label="Zoom -"><i class="fas fa-minus"></i></button>
+          <button class="lightbox-btn" id="lb-zoom-in" aria-label="Zoom +"><i class="fas fa-plus"></i></button>
+          <button class="lightbox-btn" id="lb-reset" aria-label="Reset zoom"><i class="fas fa-expand"></i></button>
+          <button class="lightbox-btn" id="lb-close" aria-label="Chiudi"><i class="fas fa-xmark"></i></button>
+        </div>
+      </div>
+      <div class="lightbox-stage" id="lb-stage">
+        <button class="lightbox-nav lightbox-prev" id="lb-prev" aria-label="Immagine precedente"><i class="fas fa-chevron-left"></i></button>
+        <img class="lightbox-img" id="lb-img" alt="" loading="lazy">
+        <button class="lightbox-nav lightbox-next" id="lb-next" aria-label="Immagine successiva"><i class="fas fa-chevron-right"></i></button>
+      </div>
+    </div>
+  </div>
+
   <script>
     /* ==============================================
        FOOTER
@@ -432,11 +468,14 @@
         category: 'infra',
         badge: 'Infrastruttura Rete',
         badgeClass: 'infra',
+        disabled: false,
+        order: 1,
+        isNew: true,
         headerHTML: '<div class="card-tech-header header-ubiquiti"><div class="brand-showcase"><div class="brand-item"><div class="brand-icon"><i class="fas fa-broadcast-tower"></i></div><span class="brand-label">airMAX</span></div><div class="brand-item"><div class="brand-icon"><i class="fas fa-satellite-dish"></i></div><span class="brand-label">Beam</span></div><div class="brand-item"><div class="brand-icon"><i class="fas fa-wifi"></i></div><span class="brand-label">UniFi AP</span></div><div class="brand-item"><div class="brand-icon"><i class="fas fa-project-diagram"></i></div><span class="brand-label">P2MP</span></div><div class="brand-item"><div class="brand-icon"><i class="fas fa-network-wired"></i></div><span class="brand-label">VLAN</span></div></div></div>',
         gallery: [
-          'assets/projects/multi-plesso/01.jpg',
-          'assets/projects/multi-plesso/02.jpg',
-          'assets/projects/multi-plesso/03.jpg'
+          'assets/articles/multi-plesso/ubiquiti3.png',
+          'assets/articles/multi-plesso/ubiquiti1.png',
+          'assets/articles/multi-plesso/ubiquiti2.png'
         ],
         article: `In questo caso abbiamo affrontato la seguente problematica: l’istituto necessitava di connessioni tra più plessi situati nello stesso spiazzale, ma non direttamente adiacenti tra loro, con impossibilità di effettuare scavi per il passaggio dei cavi.
 
@@ -458,8 +497,7 @@ La gestione centralizzata dell’intera infrastruttura è stata affidata a una U
 
 A livello di ottimizzazione, è stata abilitata la QoS per la gestione del traffico e il bilanciamento della rete.
 
-Il risultato finale è stata una infrastruttura wireless completa e funzionale, in grado di collegare 6 edifici senza opere di scavo, con prestazioni stabili e una gestione centralizzata semplificata.`
-      },
+Il risultato finale è stata una infrastruttura wireless completa e funzionale, in grado di collegare 6 edifici senza opere di scavo, con prestazioni stabili e una gestione centralizzata semplificata.`},
       {
         id: 'fesr-pon',
         title: 'Progetto FESR/PON — Infrastruttura Scolastica Chiavi in Mano',
@@ -468,11 +506,11 @@ Il risultato finale è stata una infrastruttura wireless completa e funzionale, 
         category: 'infra',
         badge: 'Infrastruttura Rete',
         badgeClass: 'infra',
+        disabled: false,
+        isNew: false,
+        order: 2,
         headerHTML: '<div class="card-tech-header header-firewall"><div class="brand-showcase"><div class="brand-item"><div class="brand-icon"><i class="fas fa-shield-alt"></i></div><span class="brand-label">FortiGate</span></div><div class="brand-item"><div class="brand-icon zyxel"><i class="fas fa-lock"></i></div><span class="brand-label">Zyxel</span></div><div class="brand-item"><div class="brand-icon watchguard"><i class="fas fa-eye"></i></div><span class="brand-label">WatchGuard</span></div><div class="brand-item"><div class="brand-icon" style="background:rgba(229,137,0,0.10);color:#e58900;"><i class="fas fa-circle-nodes"></i></div><span class="brand-label" style="color:#e58900;">UDM Pro</span></div><div class="brand-item"><div class="brand-icon" style="background:rgba(100,140,220,0.08);color:#8ab4f8;"><i class="fas fa-key"></i></div><span class="brand-label" style="color:#8899bb;">SSL-VPN</span></div></div></div>',
-        gallery: [
-          'assets/projects/fesr-pon/01.jpg',
-          'assets/projects/fesr-pon/02.jpg'
-        ],
+        gallery: [],
         articleHTML: '<h3>Descrizione</h3><p>Scrivi qui il tuo articolo (testo a mano) sul progetto FESR/PON.</p>'
       },
       {
@@ -483,10 +521,11 @@ Il risultato finale è stata una infrastruttura wireless completa e funzionale, 
         category: 'server',
         badge: 'Server & Autenticazione',
         badgeClass: 'auth',
+        disabled: false,
+        isNew: false,
+        order: 3,
         headerHTML: '<div class="card-tech-header header-ad-google"><div class="brand-showcase"><div class="brand-item"><div class="brand-icon windows"><i class="fab fa-windows"></i></div><span class="brand-label">Windows Server</span></div><div class="brand-item"><div class="brand-icon windows" style="background:rgba(0,120,212,0.08);"><i class="fas fa-sitemap"></i></div><span class="brand-label">Active Directory</span></div><div class="brand-item"><div class="brand-icon google"><i class="fab fa-google"></i></div><span class="brand-label" style="color:#4285f4;">Google Workspace</span></div><div class="brand-item"><div class="brand-icon debian"><i class="fab fa-linux"></i></div><span class="brand-label">Debian</span></div><div class="brand-item"><div class="brand-icon" style="background:rgba(92,184,138,0.08);color:var(--success);"><i class="fas fa-wifi"></i></div><span class="brand-label" style="color:var(--success);">FreeRADIUS</span></div></div></div>',
-        gallery: [
-          'assets/projects/ad-radius/01.jpg'
-        ],
+        gallery: [],
         articleHTML: '<h3>Obiettivo</h3><p>Scrivi qui il tuo articolo (testo a mano) su AD/GPO/FreeRADIUS.</p>'
       },
       {
@@ -497,14 +536,14 @@ Il risultato finale è stata una infrastruttura wireless completa e funzionale, 
         category: 'backup',
         badge: 'Backup & Recovery',
         badgeClass: 'backup',
+        disabled: false,
+        isNew: false,
+        order: 4,
         headerHTML: '<div class="card-tech-header header-backup"><div class="brand-showcase"><div class="brand-item"><div class="brand-icon synology"><i class="fas fa-hdd"></i></div><span class="brand-label" style="color:#e06848;">Synology</span></div><div class="brand-item"><div class="brand-icon"><i class="fas fa-database"></i></div><span class="brand-label">Veeam</span></div><div class="brand-item"><div class="brand-icon" style="background:rgba(100,140,220,0.06);"><i class="fas fa-layer-group"></i></div><span class="brand-label">RAID</span></div><div class="brand-item"><div class="brand-icon" style="background:rgba(200,165,92,0.08);color:var(--accent);"><i class="fas fa-cubes"></i></div><span class="brand-label" style="color:var(--accent);">Virtualizzazione</span></div></div></div>',
-        gallery: [
-          'assets/projects/backup-dr/01.jpg',
-          'assets/projects/backup-dr/02.jpg'
-        ],
+        gallery: [],
         articleHTML: '<h3>Strategia</h3><p>Scrivi qui il tuo articolo (testo a mano) su backup &amp; DR.</p>'
       }
-    ];
+];
 
     /* ==============================================
        NAVIGAZIONE
@@ -534,7 +573,14 @@ Il risultato finale è stata una infrastruttura wireless completa e funzionale, 
        ============================================== */
     var projectsGrid = document.getElementById('projects-grid');
     function renderProjects(filter) {
-      var f = filter === 'tutti' ? projects : projects.filter(function(p) { return p.category === filter; });
+      var list = projects.filter(function(p) { return !p.disabled; });
+      var f = filter === 'tutti' ? list : list.filter(function(p) { return p.category === filter; });
+      f.sort(function(a, b) {
+        var ao = typeof a.order === 'number' ? a.order : 9999;
+        var bo = typeof b.order === 'number' ? b.order : 9999;
+        if (ao !== bo) return ao - bo;
+        return (a.title || '').localeCompare(b.title || '');
+      });
       projectsGrid.innerHTML = '';
       f.forEach(function(p, i) {
         var c = document.createElement('article');
@@ -544,7 +590,8 @@ Il risultato finale è stata una infrastruttura wireless completa e funzionale, 
         c.setAttribute('aria-label', 'Apri progetto: ' + p.title);
         c.style.transitionDelay = (i * 0.1) + 's';
         var ic = p.badgeClass === 'infra' ? 'fa-network-wired' : p.badgeClass === 'auth' ? 'fa-shield-alt' : 'fa-database';
-        c.innerHTML = p.headerHTML + '<div class="card-body"><div class="card-badge ' + p.badgeClass + '"><i class="fas ' + ic + '" style="font-size:0.65rem;"></i> ' + p.badge + '</div><h3 class="card-title">' + p.title + '</h3><p class="card-desc">' + p.desc + '</p><div class="card-tags">' + p.tags.map(function(t) { return '<span class="tag">' + t + '</span>'; }).join('') + '</div></div>';
+        var newBadge = p.isNew ? '<span class="tag" style="margin-left:10px;background:rgba(92,184,138,0.10);color:var(--success);border-color:rgba(92,184,138,0.20);">NEW</span>' : '';
+        c.innerHTML = p.headerHTML + '<div class="card-body"><div class="card-badge ' + p.badgeClass + '"><i class="fas ' + ic + '" style="font-size:0.65rem;"></i> ' + p.badge + newBadge + '</div><h3 class="card-title">' + p.title + '</h3><p class="card-desc">' + p.desc + '</p><div class="card-tags">' + p.tags.map(function(t) { return '<span class="tag">' + t + '</span>'; }).join('') + '</div></div>';
         c.addEventListener('click', function() { openProjectModal(p); });
         c.addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openProjectModal(p); } });
         projectsGrid.appendChild(c);
@@ -574,6 +621,18 @@ Il risultato finale è stata una infrastruttura wireless completa e funzionale, 
     var galleryPrev = document.getElementById('gallery-prev');
     var galleryNext = document.getElementById('gallery-next');
 
+    var lightbox = document.getElementById('lightbox');
+    var lbImg = document.getElementById('lb-img');
+    var lbTitle = document.getElementById('lightbox-title');
+    var lbClose = document.getElementById('lb-close');
+    var lbPrev = document.getElementById('lb-prev');
+    var lbNext = document.getElementById('lb-next');
+    var lbZoomIn = document.getElementById('lb-zoom-in');
+    var lbZoomOut = document.getElementById('lb-zoom-out');
+    var lbReset = document.getElementById('lb-reset');
+    var lbStage = document.getElementById('lb-stage');
+    var lbScale = 1;
+
     var modalState = { open: false, project: null, index: 0, lastFocus: null };
 
     function escapeHTML(s) {
@@ -585,12 +644,29 @@ Il risultato finale è stata una infrastruttura wireless completa e funzionale, 
         .replace(/'/g, '&#39;');
     }
 
+    function renderInlineTokens(text) {
+      var out = String(text);
+      out = out.replace(/\[\[img:([^\]]+)\]\]/gi, function(_, p1) {
+        var src = String(p1 || '').trim();
+        if (!src) return '';
+        return '<img class="article-img" src="' + escapeHTML(src) + '" alt="" loading="lazy">';
+      });
+      out = out.replace(/\[\[caption:([^\]]+)\]\]/gi, function(_, p1) {
+        var cap = String(p1 || '').trim();
+        if (!cap) return '';
+        return '<div class="article-caption">' + escapeHTML(cap) + '</div>';
+      });
+      return out;
+    }
+
     function renderArticle(project) {
       if (project && typeof project.article === 'string' && project.article.trim()) {
         var text = project.article.replace(/\r\n/g, '\n').trim();
         var blocks = text.split(/\n\s*\n+/g).map(function(b) { return b.trim(); }).filter(Boolean);
         return blocks.map(function(b) {
-          var html = escapeHTML(b).replace(/\n/g, '<br>');
+          var html = escapeHTML(b);
+          html = renderInlineTokens(html);
+          html = html.replace(/\n/g, '<br>');
           return '<p>' + html + '</p>';
         }).join('');
       }
@@ -608,15 +684,55 @@ Il risultato finale è stata una infrastruttura wireless completa e funzionale, 
         galleryNext.style.opacity = '0.25';
         return;
       }
-      modalState.index = (idx + g.length) % g.length;
-      galleryImage.src = g[modalState.index];
-      galleryImage.alt = modalState.project.title + ' — immagine ' + (modalState.index + 1) + ' di ' + g.length;
+      var nextIndex = (idx + g.length) % g.length;
+      var nextSrc = g[nextIndex];
+      galleryImage.classList.add('is-switching');
+      var pre = new Image();
+      pre.onload = function() {
+        modalState.index = nextIndex;
+        galleryImage.src = nextSrc;
+        galleryImage.alt = modalState.project.title + ' — immagine ' + (modalState.index + 1) + ' di ' + g.length;
+        requestAnimationFrame(function() { galleryImage.classList.remove('is-switching'); });
+      };
+      pre.onerror = function() {
+        modalState.index = nextIndex;
+        galleryImage.src = nextSrc;
+        galleryImage.alt = modalState.project.title + ' — immagine ' + (modalState.index + 1) + ' di ' + g.length;
+        requestAnimationFrame(function() { galleryImage.classList.remove('is-switching'); });
+      };
+      pre.src = nextSrc;
       galleryPrev.style.opacity = g.length > 1 ? '1' : '0.25';
       galleryNext.style.opacity = g.length > 1 ? '1' : '0.25';
       Array.prototype.slice.call(galleryThumbs.querySelectorAll('.thumb')).forEach(function(t, i) {
-        t.classList.toggle('active', i === modalState.index);
+        t.classList.toggle('active', i === nextIndex);
       });
     }
+
+    function setLightboxScale(s) {
+      lbScale = Math.max(1, Math.min(4, s));
+      lbImg.style.transform = 'scale(' + lbScale.toFixed(3) + ')';
+    }
+
+    function openLightbox() {
+      if (!modalState.project) return;
+      var g = modalState.project.gallery || [];
+      if (!g.length) return;
+      lbImg.src = g[modalState.index];
+      lbImg.alt = modalState.project.title + ' — immagine ' + (modalState.index + 1);
+      lbTitle.textContent = modalState.project.title + ' — ' + (modalState.index + 1) + ' / ' + g.length;
+      setLightboxScale(1);
+      lightbox.classList.add('active');
+      lightbox.setAttribute('aria-hidden', 'false');
+      lbClose.focus();
+    }
+
+    function closeLightbox() {
+      lightbox.classList.remove('active');
+      lightbox.setAttribute('aria-hidden', 'true');
+    }
+
+    function lightboxPrev() { setGalleryIndex(modalState.index - 1); openLightbox(); }
+    function lightboxNext() { setGalleryIndex(modalState.index + 1); openLightbox(); }
 
     function buildThumbs(project) {
       var g = project.gallery || [];
@@ -683,12 +799,32 @@ Il risultato finale è stata una infrastruttura wireless completa e funzionale, 
 
     modalClose.addEventListener('click', closeProjectModal);
     modal.addEventListener('mousedown', function(e) { if (e.target === modal) closeProjectModal(); });
+    galleryImage.addEventListener('click', function() { if (modalState.open) openLightbox(); });
+
+    lbClose.addEventListener('click', closeLightbox);
+    lightbox.addEventListener('mousedown', function(e) { if (e.target === lightbox) closeLightbox(); });
+    lbPrev.addEventListener('click', lightboxPrev);
+    lbNext.addEventListener('click', lightboxNext);
+    lbZoomIn.addEventListener('click', function() { setLightboxScale(lbScale + 0.25); });
+    lbZoomOut.addEventListener('click', function() { setLightboxScale(lbScale - 0.25); });
+    lbReset.addEventListener('click', function() { setLightboxScale(1); });
+
     document.addEventListener('keydown', function(e) {
       if (!modalState.open) return;
       if (e.key === 'Escape') { e.preventDefault(); closeProjectModal(); return; }
       if (e.key === 'ArrowLeft') { e.preventDefault(); setGalleryIndex(modalState.index - 1); return; }
       if (e.key === 'ArrowRight') { e.preventDefault(); setGalleryIndex(modalState.index + 1); return; }
       focusTrap(e);
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (!lightbox.classList.contains('active')) return;
+      if (e.key === 'Escape') { e.preventDefault(); closeLightbox(); return; }
+      if (e.key === 'ArrowLeft') { e.preventDefault(); lightboxPrev(); return; }
+      if (e.key === 'ArrowRight') { e.preventDefault(); lightboxNext(); return; }
+      if (e.key === '+' || e.key === '=') { e.preventDefault(); setLightboxScale(lbScale + 0.25); return; }
+      if (e.key === '-') { e.preventDefault(); setLightboxScale(lbScale - 0.25); return; }
+      if (e.key === '0') { e.preventDefault(); setLightboxScale(1); return; }
     });
     galleryPrev.addEventListener('click', function() { setGalleryIndex(modalState.index - 1); });
     galleryNext.addEventListener('click', function() { setGalleryIndex(modalState.index + 1); });
