@@ -5,7 +5,7 @@ const multer = require('multer');
 const { spawn } = require('child_process');
 
 const ROOT = __dirname;
-const PORT = process.env.PORT ? Number(process.env.PORT) : 5173;
+const PORT = Number(process.env.PORT) > 0 ? Number(process.env.PORT) : 5173;
 
 const app = express();
 app.use(express.json({ limit: '10mb' }));
@@ -808,7 +808,19 @@ app.post('/api/publish', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Admin: http://localhost:${PORT}/`);
   console.log(`CV:    http://localhost:${PORT}/cv`);
+});
+
+server.on('error', (err) => {
+  if (err && err.code === 'EADDRINUSE') {
+    console.error(`\nERRORE: porta ${PORT} già in uso.`);
+    console.error('Chiudi l\'altro server oppure avvia con una porta diversa:');
+    console.error('  set PORT=5174 && npm start\n');
+    process.exitCode = 1;
+    return;
+  }
+  console.error(err);
+  process.exitCode = 1;
 });
