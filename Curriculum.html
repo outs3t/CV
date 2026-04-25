@@ -186,6 +186,11 @@
     body.custom-cursor,
     body.custom-cursor *{cursor:none !important;}
     .modal-meta{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 18px;}
+    .modal-right-topbar{position:sticky;top:0;z-index:3;background:rgba(24,24,24,0.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding:14px 14px 10px;border-bottom:1px solid rgba(255,255,255,0.06);margin:-26px -26px 16px;}
+    .modal-right-topbar .modal-title-mini{font-family:'Playfair Display',serif;font-weight:800;font-size:0.98rem;color:var(--fg);}
+    .modal-right-topbar .modal-close{margin-left:auto;}
+    .modal-actions{display:flex;justify-content:flex-end;margin-top:18px;}
+    .modal-actions .btn-outline{padding:10px 16px;border-radius:14px;font-size:0.85rem;}
     .modal-body{font-size:0.92rem;line-height:1.9;color:var(--fg-muted);overflow-wrap:break-word;word-break:normal;hyphens:auto;}
     .modal-body h3{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--fg);margin:18px 0 8px;}
     .modal-body p{margin:10px 0;}
@@ -455,8 +460,17 @@
         <div class="gallery-thumbs" id="gallery-thumbs" aria-label="Anteprime galleria"></div>
       </div>
       <div class="modal-right">
+        <div class="modal-right-topbar" aria-hidden="false">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div class="modal-title-mini" id="project-modal-title-mini">Dettaglio progetto</div>
+            <button class="modal-close" id="project-modal-close-right" aria-label="Chiudi"><i class="fas fa-xmark"></i></button>
+          </div>
+        </div>
         <div class="modal-meta" id="project-modal-tags"></div>
         <div class="modal-body" id="project-modal-body"></div>
+        <div class="modal-actions">
+          <button class="btn-outline" id="project-modal-close-bottom" aria-label="Chiudi">Chiudi</button>
+        </div>
       </div>
     </div>
   </div>
@@ -1333,6 +1347,8 @@ Il progetto ha permesso di ottenere una rete **scalabile, sicura e performante**
       modalState.index = 0;
 
       modalTitle.textContent = project.title;
+      var tmini = document.getElementById('project-modal-title-mini');
+      if (tmini) tmini.textContent = project.title;
       modalTags.innerHTML = (project.tags || []).map(function(t) { return '<span class="tag">' + t + '</span>'; }).join('');
       modalBody.innerHTML = renderArticle(project);
 
@@ -1382,6 +1398,10 @@ Il progetto ha permesso di ottenere una rete **scalabile, sicura e performante**
     }
 
     modalClose.addEventListener('click', closeProjectModal);
+    var modalCloseRight = document.getElementById('project-modal-close-right');
+    if (modalCloseRight) modalCloseRight.addEventListener('click', closeProjectModal);
+    var modalCloseBottom = document.getElementById('project-modal-close-bottom');
+    if (modalCloseBottom) modalCloseBottom.addEventListener('click', closeProjectModal);
     modal.addEventListener('mousedown', function(e) { if (e.target === modal) closeProjectModal(); });
     galleryImage.addEventListener('click', function() { if (modalState.open) openLightbox(); });
 
