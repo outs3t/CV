@@ -207,7 +207,17 @@
     .modal-right::-webkit-scrollbar-track{background:rgba(12,12,12,0.25);border-left:1px solid rgba(255,255,255,0.04);}
     .modal-right::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.12);border-radius:10px;border:2px solid rgba(12,12,12,0.35);}
     .modal-right::-webkit-scrollbar-thumb:hover{background:rgba(200,165,92,0.35);}
-    @media(max-width:900px){.modal{grid-template-columns:1fr;height:92vh;}.modal-right{border-left:none;border-top:1px solid var(--border);min-width:0;} .gallery-img{max-height:46vh;} .gallery-prev{left:14px;} .gallery-next{right:14px;}}
+    @media(max-width:900px){
+      .modal{display:flex;flex-direction:column;height:92vh;}
+      .modal-left{flex:0 0 auto;}
+      .modal-topbar{position:sticky;top:0;left:0;right:0;background:rgba(24,24,24,0.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding:14px 14px 10px;}
+      .gallery-stage{flex:0 0 auto;max-height:52vh;padding:18px;}
+      .gallery-thumbs{flex:0 0 auto;}
+      .modal-right{flex:1 1 auto;border-left:none;border-top:1px solid var(--border);min-width:0;}
+      .gallery-img{max-height:44vh;}
+      .gallery-prev{left:14px;}
+      .gallery-next{right:14px;}
+    }
     @media(max-width:860px){.cv-grid{grid-template-columns:1fr!important;}.hero-name{font-size:2.3rem;}.cv-card{padding:24px;}.profile-img-wrap{width:110px;height:110px;}.hero-header-row{gap:18px;}.projects-grid-main{grid-template-columns:1fr!important;}.projects-grid-main .project-card:first-child{grid-column:auto;}.projects-grid-main .project-card:first-child .card-tech-header{height:200px;}.projects-grid-main .project-card:first-child .brand-icon{width:56px;height:56px;font-size:1.5rem;border-radius:14px;}}
     @media(max-width:480px){.hero-cv{padding:120px 0 40px;}.nav-pill{padding:8px 18px;font-size:0.82rem;}.brand-showcase{gap:14px;}.brand-icon{width:46px;height:46px;font-size:1.2rem;}}
     ::-webkit-scrollbar{width:6px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
