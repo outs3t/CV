@@ -52,6 +52,31 @@
     select,input,textarea,button{font:inherit;}
     select,input,textarea{width:100%;background:#0f0f0f;color:var(--fg);border:1px solid var(--border);border-radius:12px;padding:10px 12px;outline:none;}
     textarea{min-height:340px;resize:vertical;line-height:1.55;}
+    #article{color:rgba(220,216,210,0.92);background:#0e0f12;font-size:14px;line-height:1.75;caret-color:rgba(220,216,210,0.92);}
+    .article-split{display:grid;grid-template-columns:1fr;gap:14px;}
+    .article-preview{min-height:340px;max-height:540px;overflow:auto;padding:12px 12px;border-radius:12px;border:1px solid var(--border);background:#0e0f12;color:rgba(220,216,210,0.92);line-height:1.8;}
+    .article-preview p{margin:0 0 12px;}
+    .article-preview code{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);padding:2px 6px;border-radius:8px;}
+    .article-preview ul,.article-preview ol{margin:0 0 12px 20px;padding:0;}
+    .article-preview li{margin:6px 0;}
+    .article-preview .kw{font-weight:900;}
+    .article-preview .kw.note{color:#8ab4f8;}
+    .article-preview .kw.warn{color:#ffb86b;}
+    .article-preview .kw.tech{color:#7ee787;}
+    .article-preview .kw.vendor{color:#c8a55c;}
+    .article-preview.wow-mode .kw,
+    .article-preview.wow-mode strong{
+      background: linear-gradient(90deg, rgba(200,165,92,0.00), rgba(200,165,92,0.18), rgba(200,165,92,0.00));
+      background-size: 220% 100%;
+      animation: wowShine 6.5s linear infinite;
+      border-radius: 6px;
+      padding: 0 2px;
+    }
+    @keyframes wowShine{0%{background-position:0% 50%}100%{background-position:220% 50%}}
+    @media (min-width: 980px){
+      .article-split{grid-template-columns:1.1fr 0.9fr;align-items:start;}
+      .article-preview{position:sticky;top:16px;}
+    }
     button{background:var(--accent);color:#0c0c0c;border:0;border-radius:999px;padding:10px 16px;font-weight:800;cursor:pointer;}
     button.secondary{background:transparent;color:var(--fg);border:1px solid var(--border);font-weight:700;}
     button.ghost{background:rgba(255,255,255,0.04);color:var(--fg);border:1px solid rgba(255,255,255,0.08);font-weight:700;}
@@ -134,7 +159,36 @@
         <div style="height:12px"></div>
 
         <label>Articolo</label>
-        <textarea id="article" placeholder="Incolla qui il testo..."></textarea>
+        <div class="row" style="justify-content:space-between;gap:10px;margin-bottom:10px;">
+          <div class="row" style="gap:10px;">
+            <div style="min-width:220px;">
+              <select id="kwType" aria-label="Tipo evidenziazione">
+                <option value="vendor">Vendor</option>
+                <option value="tech">Tech</option>
+                <option value="note">Nota</option>
+                <option value="warn">Warning</option>
+                <option value="random">Random</option>
+              </select>
+            </div>
+            <button class="secondary" id="btn-hl" type="button">Colora selezione</button>
+            <label class="pill" style="cursor:pointer;user-select:none;">
+              <input type="checkbox" id="kwClick" style="margin:0;" />
+              Click-to-color
+            </label>
+            <button class="ghost" id="btn-auto" type="button">Auto evidenzia</button>
+          </div>
+          <div class="muted" style="font-size:12px;">Suggerimento: seleziona una parola e premi “Colora selezione”</div>
+        </div>
+        <div class="article-split">
+          <div>
+            <div class="muted" style="font-size:12px;margin:0 0 6px;">Editor (testo salvato)</div>
+            <textarea id="article" placeholder="Incolla qui il testo..."></textarea>
+          </div>
+          <div>
+            <div class="muted" style="font-size:12px;margin:0 0 6px;">Anteprima (renderizzata — può contenere &lt;span&gt;)</div>
+            <div class="article-preview" id="articlePreview" aria-label="Anteprima articolo"></div>
+          </div>
+        </div>
 
         <div style="height:12px"></div>
 
@@ -339,6 +393,327 @@
     const j = await r.json().catch(() => ({}));
     if (!r.ok || !j.ok) throw new Error(j.error || ('Errore ' + r.status));
     return j.article || '';
+  }
+
+  function escapeHtml(s) {
+    return String(s || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function kwColor(word) {
+    const w = String(word || '').toLowerCase();
+    let h = 0;
+    for (let i = 0; i < w.length; i++) h = (h * 31 + w.charCodeAt(i)) >>> 0;
+    const hue = h % 360;
+    return 'hsl(' + hue + ', 85%, 70%)';
+  }
+
+  function kwClassColor(type, word) {
+    const t = String(type || '').toLowerCase();
+    if (t === 'vendor') return { cls: 'vendor', color: null };
+    if (t === 'tech') return { cls: 'tech', color: null };
+    if (t === 'note') return { cls: 'note', color: null };
+    if (t === 'warn') return { cls: 'warn', color: null };
+    if (t === 'random') return { cls: 'random', color: kwColor(word) };
+    return { cls: 'random', color: kwColor(word) };
+  }
+
+  function renderInline(text) {
+    let out = escapeHtml(text);
+
+    // [[kw:type|text]] tokens
+    out = out.replace(/\[\[kw:([a-z0-9_-]+)\|([\s\S]*?)\]\]/gi, function(_, t, w) {
+      const info = kwClassColor(t, w);
+      const inner = escapeHtml(w);
+      const style = info.color ? ' style="color:' + info.color + '"' : '';
+      return '<span class="kw ' + info.cls + '"' + style + '>' + inner + '</span>';
+    });
+
+    // **bold** (do not escape inner: base text is already escaped; spans/code are safe)
+    out = out.replace(/\*\*([\s\S]+?)\*\*/g, function(_, inner) {
+      return '<strong>' + inner + '</strong>';
+    });
+    // *italic* (basic)
+    out = out.replace(/(^|\s)\*([^*\s][^*]*?)\*(?=\s|$)/g, function(_, pre, w) {
+      return pre + '<em>' + escapeHtml(w) + '</em>';
+    });
+
+    // `code`
+    out = out.replace(/`([^`]+)`/g, function(_, w) {
+      const inner = escapeHtml(w);
+      return '<code>' + inner + '</code>';
+    });
+    // #keyword and @keyword
+    out = out.replace(/(^|\s)([#@])([a-zA-Z0-9_+.-]{2,})(?=\b)/g, function(_, pre, sym, w) {
+      const color = kwColor(w);
+      return pre + '<span class="kw" style="color:' + color + '">' + escapeHtml(w) + '</span>';
+    });
+    return out;
+  }
+
+  function wrapSelectionWithKw() {
+    const ta = el('article');
+    const type = (el('kwType') ? el('kwType').value : 'random');
+    if (!ta) return;
+    const start = ta.selectionStart;
+    const end = ta.selectionEnd;
+    if (start === end) {
+      status('Seleziona una parola o una frase da colorare.');
+      return;
+    }
+    const selected = ta.value.slice(start, end);
+    const before = ta.value.slice(0, start);
+    const after = ta.value.slice(end);
+    const token = '[[kw:' + type + '|' + selected + ']]';
+    const st = ta.scrollTop;
+    ta.value = before + token + after;
+    ta.focus();
+    const newEnd = start + token.length;
+    ta.setSelectionRange(newEnd, newEnd);
+    ta.scrollTop = st;
+    renderArticlePreview(ta.value);
+  }
+
+  function applyAutoHighlight(text) {
+    let src = String(text || '');
+
+    // If the user pasted rendered HTML (e.g. from preview/CV), normalize it back.
+    // Decode minimal HTML entities if tags were pasted as text.
+    src = src
+      .replace(/&lt;/gi, '<')
+      .replace(/&gt;/gi, '>')
+      .replace(/&quot;/gi, '"')
+      .replace(/&#34;/g, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/&amp;/gi, '&');
+
+    // Normalize malformed tags like "<<span" or ">>" that may appear when pasting.
+    src = src
+      .replace(/<\s*</g, '<')
+      .replace(/>\s*>/g, '>')
+      .replace(/<+/g, '<')
+      .replace(/>+/g, '>');
+
+    // Convert existing kw spans back to tokens.
+    src = src.replace(/<span\b[^>]*\bclass\s*=\s*(["'])([^"']+)\1[^>]*>([\s\S]*?)<\/span>/gi, function(_, q, classVal, w) {
+      const cls = String(classVal || '').toLowerCase();
+      const inner = String(w || '').replace(/<[^>]+>/g, '');
+      if (cls.indexOf('kw') !== -1) {
+        const types = ['vendor', 'tech', 'note', 'warn', 'random'];
+        for (let i = 0; i < types.length; i++) {
+          if (cls.indexOf(types[i]) !== -1) return '[[kw:' + types[i] + '|' + inner + ']]';
+        }
+        return '[[kw:random|' + inner + ']]';
+      }
+      return inner;
+    });
+
+    // Remove any kind of span tag even if malformed (e.g. "<<span ...>")
+    src = src
+      .replace(/<+\s*span\b[^>]*>/gi, '')
+      .replace(/<+\s*\/\s*span\s*>/gi, '');
+    // Any other span -> keep inner text only (never keep HTML in article)
+    src = src.replace(/<span\b[^>]*>([\s\S]*?)<\/span>/gi, function(_, w) {
+      return String(w || '').replace(/<[^>]+>/g, '');
+    });
+    // Basic HTML -> text normalization
+    src = src
+      .replace(/<br\s*\/?\s*>/gi, '\n')
+      .replace(/<\/?p\b[^>]*>/gi, '\n\n')
+      .replace(/<\/?div\b[^>]*>/gi, '\n')
+      .replace(/<\/?strong\b[^>]*>/gi, '**')
+      .replace(/<\/?em\b[^>]*>/gi, '*')
+      .replace(/<hr\b[^>]*>/gi, '\n\n---\n\n');
+    // Strip any remaining tags
+    src = src.replace(/<[^>]+>/g, '');
+    // Hard-stop: remove any leftover span tags that might have survived malformed HTML.
+    src = src.replace(/<\/?span\b[^>]*>/gi, '');
+
+    const tokenRegex = /\[\[kw:([a-z0-9_-]+)\|([\s\S]*?)\]\]/gi;
+    const tokens = [];
+    const masked = src.replace(tokenRegex, function(m) {
+      const idx = tokens.push(m) - 1;
+      return `\u0000KW${idx}\u0000`;
+    });
+
+    const patterns = [
+      { type: 'warn', re: /\b(attentio(?:ne)?|warning|rischio|criticit[aà]|importante|nb)\b/gi },
+      { type: 'note', re: /\b(nota|osservazione|nota:|nota\s+bene)\b/gi },
+      { type: 'vendor', re: /\b(ubiquiti|unifi|fortinet|fortigate|watchguard|zyxel|huawei|cisco|mikrotik|palo\s*alto|juniper|aruba|dell|legrand|tp-?link|microsoft)\b/gi },
+      { type: 'tech', re: /\b(windows\s+server\s*\d{0,4}|hyper-?v|active\s+directory|gpo|radius|freeradius|proxmox|raid\s*[0-9]+|dhcp|dns|vlan|vpn|ssl-?vpn|rdp|sfp|10\s*gbps|1\s*gbps|lte|fiber|fibra|cat\s*6a|cat\s*6|poe|wifi|wi-?fi)\b/gi },
+      { type: 'tech', re: /\b(u6\s*(?:pro|long\s*range|lr)?|udm\s*-?\s*pro|usw\s*-?\s*\d+\s*-?\s*poe|cloud\s*key\s*gen\s*2|poweredge\s*[a-z0-9-]+|firebox\s*t\d+|fortigate\s*\d+[a-z]?|ts-?\d{3,})\b/gi }
+    ];
+
+    function wrapByRegex(s, type, re) {
+      return s.replace(re, function(m) {
+        return '[[kw:' + type + '|' + m + ']]';
+      });
+    }
+
+    function applyOutsideTokens(line, fn) {
+      const re = /(\u0000KW\d+\u0000)/g;
+      const parts = String(line || '').split(re);
+      for (let i = 0; i < parts.length; i++) {
+        if (re.test(parts[i])) continue;
+        parts[i] = fn(parts[i]);
+      }
+      return parts.join('');
+    }
+
+    const lines = masked.split(/\r?\n/);
+    const outLines = lines.map(function(line) {
+      const t = String(line);
+      const trimmed = t.trim();
+      if (!trimmed) return t;
+      if (/^(nb|nota)\s*[:\-]/i.test(trimmed)) return '[[kw:note|' + t + ']]';
+      if (/^(attenzione|warning)\s*[:\-]/i.test(trimmed)) return '[[kw:warn|' + t + ']]';
+
+      let s = t;
+      s = applyOutsideTokens(s, function(seg) {
+        let out = seg;
+        patterns.forEach(function(p) {
+          out = wrapByRegex(out, p.type, p.re);
+        });
+        return out;
+      });
+      return s;
+    }).join('\n');
+
+    let finalText = outLines.replace(/\u0000KW(\d+)\u0000/g, function(_, n) {
+      const i = Number(n);
+      return tokens[i] || '';
+    });
+
+    // Final safety: no HTML must remain in the textarea.
+    const beforeSanitize = finalText;
+    finalText = finalText
+      .replace(/<[^>]+>/g, '')
+      .replace(/<\/?span\b[^>]*>/gi, '')
+      // In case of malformed tags or stray brackets, remove any remaining angle brackets
+      .replace(/[<>]/g, '')
+      // In case some pasted content contains 'span class="kw ..."' without brackets
+      .replace(/\bspan\s+class\s*=\s*"kw\s+(vendor|tech|note|warn|random)"/gi, '')
+      .replace(/\bspan\s+class\s*=\s*'kw\s+(vendor|tech|note|warn|random)'/gi, '');
+
+    if (beforeSanitize !== finalText) {
+      // Non-blocking info for debugging
+      status('Auto evidenzia: ripulito HTML incollato.');
+    }
+    return finalText;
+  }
+
+  function wrapWordAtCaretWithKw() {
+    const ta = el('article');
+    const type = (el('kwType') ? el('kwType').value : 'random');
+    if (!ta) return;
+    const pos = ta.selectionStart;
+    const v = ta.value;
+    if (pos === null || pos === undefined) return;
+
+    const isWordChar = (ch) => /[a-zA-Z0-9_+.-]/.test(ch);
+    let l = pos;
+    let r = pos;
+    while (l > 0 && isWordChar(v[l - 1])) l--;
+    while (r < v.length && isWordChar(v[r])) r++;
+    if (l === r) return;
+
+    // Avoid wrapping if we're already inside a kw token
+    const leftWindow = v.slice(Math.max(0, l - 10), l);
+    const rightWindow = v.slice(r, Math.min(v.length, r + 3));
+    if (leftWindow.includes('[[kw:') || rightWindow.includes(']]')) return;
+
+    const selected = v.slice(l, r);
+    const token = '[[kw:' + type + '|' + selected + ']]';
+    const st = ta.scrollTop;
+    ta.value = v.slice(0, l) + token + v.slice(r);
+    ta.focus();
+    const newPos = l + token.length;
+    ta.setSelectionRange(newPos, newPos);
+    ta.scrollTop = st;
+    renderArticlePreview(ta.value);
+  }
+
+  function renderArticlePreview(text) {
+    const elPrev = el('articlePreview');
+    if (!elPrev) return;
+    const raw = String(text || '').replace(/\r\n/g, '\n');
+    const wowMode = /\[\[kw:/i.test(raw) || /\*\*[^\n]+\*\*/.test(raw);
+    const src = raw.replace(/\[\[wow:on\]\]\s*\n?/gi, '');
+    elPrev.classList.toggle('wow-mode', !!wowMode);
+    const lines = src.split('\n');
+    let html = '';
+    let mode = null; // 'ul' | 'ol'
+    let para = [];
+
+    function flushPara() {
+      if (!para.length) return;
+      const joined = para.join('\n');
+      html += '<p>' + renderInline(joined).replace(/\n/g, '<br>') + '</p>';
+      para = [];
+    }
+    function openList(t) {
+      if (mode === t) return;
+      closeList();
+      mode = t;
+      html += t === 'ul' ? '<ul>' : '<ol>';
+    }
+    function closeList() {
+      if (!mode) return;
+      html += mode === 'ul' ? '</ul>' : '</ol>';
+      mode = null;
+    }
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const trimmed = line.trim();
+      if (!trimmed) {
+        flushPara();
+        closeList();
+        continue;
+      }
+
+      if (/^-{3,}$/.test(trimmed)) {
+        flushPara();
+        closeList();
+        html += '<hr>';
+        continue;
+      }
+
+      const mHx = /^\s*#{2,}\s+(.*)$/.exec(line);
+      if (mHx) {
+        flushPara();
+        closeList();
+        html += '<p><strong>' + renderInline(mHx[1]) + '</strong></p>';
+        continue;
+      }
+
+      const mUl = /^\s*[-*]\s+(.*)$/.exec(line);
+      const mOl = /^\s*(\d+)\.\s+(.*)$/.exec(line);
+      if (mUl) {
+        flushPara();
+        openList('ul');
+        html += '<li>' + renderInline(mUl[1]) + '</li>';
+        continue;
+      }
+      if (mOl) {
+        flushPara();
+        openList('ol');
+        html += '<li>' + renderInline(mOl[2]) + '</li>';
+        continue;
+      }
+
+      closeList();
+      para.push(line);
+    }
+
+    flushPara();
+    closeList();
+
+    elPrev.innerHTML = html || '<p class="muted">Anteprima: incolla o scrivi del testo nell\'articolo.</p>';
   }
 
   async function loadGallery(projectId) {
@@ -647,6 +1022,7 @@
       const pid = el('projectId').value;
       if (pid) {
         el('article').value = await loadArticle(pid);
+        renderArticlePreview(el('article').value);
         renderGalleryList(await loadGallery(pid));
       }
       renderProjectsMeta(await loadProjectsMeta());
@@ -661,6 +1037,7 @@
       status('Caricamento...');
       const pid = el('projectId').value;
       el('article').value = await loadArticle(pid);
+      renderArticlePreview(el('article').value);
       renderGalleryList(await loadGallery(pid));
       status('OK: articolo + gallery caricati.');
     } catch (e) {
@@ -668,6 +1045,49 @@
     } finally {
       setBusy(false);
     }
+  });
+
+  el('article').addEventListener('input', function() {
+    renderArticlePreview(el('article').value);
+  });
+
+  el('btn-hl').addEventListener('click', function() {
+    wrapSelectionWithKw();
+  });
+
+  function runAutoSoft() {
+    const ta = el('article');
+    if (!ta) return;
+    const st = ta.scrollTop;
+    const ss = ta.selectionStart;
+    const se = ta.selectionEnd;
+    let out = applyAutoHighlight(ta.value);
+    const before = out;
+    // Absolute guarantee: no HTML tags should ever remain in saved article.
+    out = out
+      .replace(/<[^>]+>/g, '')
+      .replace(/[<>]/g, '')
+      .replace(/\bspan\s+class\s*=\s*"kw[^"]*"/gi, '')
+      .replace(/\bspan\s+class\s*=\s*'kw[^']*'/gi, '');
+    ta.value = out;
+    ta.focus();
+    try { ta.setSelectionRange(ss, se); } catch (e) {}
+    ta.scrollTop = st;
+    renderArticlePreview(ta.value);
+    status(before !== out ? 'Auto evidenzia: completato (ripulito HTML).'
+      : 'Auto evidenzia: completato.');
+  }
+
+  el('btn-auto').addEventListener('click', runAutoSoft);
+
+  el('article').addEventListener('click', function() {
+    const cb = el('kwClick');
+    if (!cb || !cb.checked) return;
+    // If a selection exists, don't auto-wrap on click.
+    const ta = el('article');
+    if (!ta) return;
+    if (ta.selectionStart !== ta.selectionEnd) return;
+    wrapWordAtCaretWithKw();
   });
 
   el('btn-refresh-gallery').addEventListener('click', async () => {

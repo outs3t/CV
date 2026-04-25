@@ -138,7 +138,7 @@
     .modal-overlay.active{display:flex;}
     .modal-overlay.active.opening{animation:overlayIn 220ms ease-out both;}
     .modal-overlay.active.closing{animation:overlayOut 180ms ease-in both;}
-    .modal{width:min(1040px,100%);height:min(88vh,920px);background:rgba(24,24,24,0.92);border:1px solid rgba(255,255,255,0.08);border-radius:18px;box-shadow:0 30px 120px rgba(0,0,0,0.65);overflow:hidden;display:grid;grid-template-columns:1.15fr 0.85fr;}
+    .modal{width:min(1040px,100%);height:min(88vh,920px);background:rgba(24,24,24,0.92);border:1px solid rgba(255,255,255,0.08);border-radius:18px;box-shadow:0 30px 120px rgba(0,0,0,0.65);overflow:hidden;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(360px,0.85fr);}
     .modal-overlay.active.opening .modal{animation:modalIn 260ms cubic-bezier(0.2,0.9,0.2,1) both;}
     .modal-overlay.active.closing .modal{animation:modalOut 180ms ease-in both;}
     @keyframes overlayIn{from{opacity:0;}to{opacity:1;}}
@@ -146,14 +146,32 @@
     @keyframes modalIn{from{opacity:0;transform:translateY(12px) scale(0.98);}to{opacity:1;transform:translateY(0) scale(1);}}
     @keyframes modalOut{from{opacity:1;transform:translateY(0) scale(1);}to{opacity:0;transform:translateY(8px) scale(0.985);}}
     .modal-left{position:relative;background:linear-gradient(180deg,rgba(200,165,92,0.06),transparent 60%);min-height:0;display:flex;flex-direction:column;}
-    .modal-right{border-left:1px solid var(--border);padding:26px 26px 22px;overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable;-webkit-overflow-scrolling:touch;min-height:0;}
+    .modal-right{border-left:1px solid var(--border);padding:26px 26px 22px;overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable;-webkit-overflow-scrolling:touch;min-height:0;min-width:360px;}
     .modal-topbar{position:absolute;top:14px;left:14px;right:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;z-index:2;}
     .modal-title{font-family:'Playfair Display',serif;font-weight:800;font-size:1.05rem;letter-spacing:-0.01em;color:var(--fg);}
     .modal-close{width:40px;height:40px;border-radius:12px;border:1px solid rgba(255,255,255,0.10);background:rgba(12,12,12,0.35);color:var(--fg);cursor:pointer;transition:transform 0.2s ease,border-color 0.2s ease;display:flex;align-items:center;justify-content:center;}
     .modal-close:hover{transform:translateY(-1px);border-color:rgba(200,165,92,0.4);}
     .gallery-stage{flex:1;display:flex;align-items:center;justify-content:center;position:relative;padding:54px 18px 18px;}
-    .gallery-img{width:100%;height:100%;object-fit:contain;border-radius:14px;border:1px solid rgba(255,255,255,0.08);background:rgba(12,12,12,0.35);max-height:calc(88vh - 170px);opacity:1;transform:translateY(0);transition:opacity 180ms ease,transform 220ms ease;}
-    .gallery-img.is-switching{opacity:0;transform:translateY(8px);}
+    .gallery-stage::after{
+      content:'';
+      position:absolute;
+      inset:28px 18px 18px;
+      border-radius:16px;
+      pointer-events:none;
+      background:linear-gradient(110deg, rgba(255,255,255,0) 20%, rgba(255,255,255,0.10) 40%, rgba(255,255,255,0) 60%);
+      background-size:220% 100%;
+      opacity:0;
+      filter:blur(5px);
+      transform:translate3d(0,0,0);
+    }
+    .gallery-stage.is-switching::after{
+      opacity:0.55;
+      animation: gallerySheen 720ms ease-out 1;
+    }
+    @keyframes gallerySheen{0%{background-position:0% 50%;opacity:0}30%{opacity:.55}100%{background-position:220% 50%;opacity:0}}
+
+    .gallery-img{width:100%;height:100%;object-fit:contain;border-radius:14px;border:1px solid rgba(255,255,255,0.08);background:rgba(12,12,12,0.35);max-height:calc(88vh - 170px);opacity:1;transform:translateY(0) scale(1);filter:blur(0);transition:opacity 260ms ease,transform 420ms cubic-bezier(.2,.9,.2,1),filter 420ms cubic-bezier(.2,.9,.2,1);}
+    .gallery-img.is-switching{opacity:0;transform:translateY(14px) scale(0.985);filter:blur(4px);}
     .gallery-nav{position:absolute;top:50%;transform:translateY(-50%);width:46px;height:46px;border-radius:14px;border:1px solid rgba(255,255,255,0.10);background:rgba(12,12,12,0.38);color:var(--fg);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform 0.2s ease,border-color 0.2s ease,opacity 0.2s ease;}
     .gallery-nav:hover{transform:translateY(-50%) scale(1.03);border-color:rgba(200,165,92,0.4);}
     .gallery-prev{left:20px;}
@@ -163,7 +181,7 @@
     .thumb:hover{opacity:1;transform:translateY(-1px);}
     .thumb.active{opacity:1;border-color:rgba(200,165,92,0.55);}
     .modal-meta{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 18px;}
-    .modal-body{font-size:0.92rem;line-height:1.9;color:var(--fg-muted);overflow-wrap:anywhere;word-break:break-word;}
+    .modal-body{font-size:0.92rem;line-height:1.9;color:var(--fg-muted);overflow-wrap:break-word;word-break:normal;hyphens:auto;}
     .modal-body h3{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--fg);margin:18px 0 8px;}
     .modal-body p{margin:10px 0;}
     .modal-body .article-img{width:100%;height:auto;display:block;border-radius:14px;border:1px solid rgba(255,255,255,0.10);background:rgba(12,12,12,0.25);margin:14px 0;}
@@ -189,7 +207,7 @@
     .modal-right::-webkit-scrollbar-track{background:rgba(12,12,12,0.25);border-left:1px solid rgba(255,255,255,0.04);}
     .modal-right::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.12);border-radius:10px;border:2px solid rgba(12,12,12,0.35);}
     .modal-right::-webkit-scrollbar-thumb:hover{background:rgba(200,165,92,0.35);}
-    @media(max-width:900px){.modal{grid-template-columns:1fr;height:92vh;}.modal-right{border-left:none;border-top:1px solid var(--border);} .gallery-img{max-height:46vh;} .gallery-prev{left:14px;} .gallery-next{right:14px;}}
+    @media(max-width:900px){.modal{grid-template-columns:1fr;height:92vh;}.modal-right{border-left:none;border-top:1px solid var(--border);min-width:0;} .gallery-img{max-height:46vh;} .gallery-prev{left:14px;} .gallery-next{right:14px;}}
     @media(max-width:860px){.cv-grid{grid-template-columns:1fr!important;}.hero-name{font-size:2.3rem;}.cv-card{padding:24px;}.profile-img-wrap{width:110px;height:110px;}.hero-header-row{gap:18px;}.projects-grid-main{grid-template-columns:1fr!important;}.projects-grid-main .project-card:first-child{grid-column:auto;}.projects-grid-main .project-card:first-child .card-tech-header{height:200px;}.projects-grid-main .project-card:first-child .brand-icon{width:56px;height:56px;font-size:1.5rem;border-radius:14px;}}
     @media(max-width:480px){.hero-cv{padding:120px 0 40px;}.nav-pill{padding:8px 18px;font-size:0.82rem;}.brand-showcase{gap:14px;}.brand-icon{width:46px;height:46px;font-size:1.2rem;}}
     ::-webkit-scrollbar{width:6px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
@@ -469,35 +487,143 @@
         badge: 'Infrastruttura Rete',
         badgeClass: 'infra',
         disabled: false,
-        order: 1,
-        isNew: true,
+        order: 2,
+        isNew: false,
         headerHTML: '<div class="card-tech-header header-ubiquiti"><div class="brand-showcase"><div class="brand-item"><div class="brand-icon"><i class="fas fa-broadcast-tower"></i></div><span class="brand-label">airMAX</span></div><div class="brand-item"><div class="brand-icon"><i class="fas fa-satellite-dish"></i></div><span class="brand-label">Beam</span></div><div class="brand-item"><div class="brand-icon"><i class="fas fa-wifi"></i></div><span class="brand-label">UniFi AP</span></div><div class="brand-item"><div class="brand-icon"><i class="fas fa-project-diagram"></i></div><span class="brand-label">P2MP</span></div><div class="brand-item"><div class="brand-icon"><i class="fas fa-network-wired"></i></div><span class="brand-label">VLAN</span></div></div></div>',
         gallery: [
           'assets/articles/multi-plesso/ubiquiti3.png',
           'assets/articles/multi-plesso/ubiquiti1.png',
           'assets/articles/multi-plesso/ubiquiti2.png'
         ],
-        article: `In questo caso abbiamo affrontato la seguente problematica: l’istituto necessitava di connessioni tra più plessi situati nello stesso spiazzale, ma non direttamente adiacenti tra loro, con impossibilità di effettuare scavi per il passaggio dei cavi.
+        article: `In questo caso abbiamo affrontato la seguente problematica: l’istituto necessitava di connettività tra più plessi situati nello stesso spiazzale, ma non direttamente adiacenti, con **impossibilità di effettuare scavi** per il passaggio dei cavi.
 
-La connettività principale era basata su fibra ottica a 1 Gbps, terminata su un router Huawei AR651, con connessione LTE di backup per garantire ridondanza in caso di down della linea principale. La fibra era stata recentemente installata, ma l’istituto disponeva di un budget limitato e si rendeva necessario attrezzare in tempi rapidi 6 edifici con una connessione stabile e funzionale.
+---
 
-È stata effettuata un’analisi dell’hardware disponibile e sono stati recuperati circa 40 access point Ubiquiti AC-Lite. L’infrastruttura esistente utilizzava switch Gigabit standard TP-Link, ma non è stato possibile sostituirli né intervenire sulla loro configurazione avanzata, limitando quindi la possibilità di implementare VLAN per la segmentazione della rete.
+### Connettività e vincoli iniziali
 
-Per garantire uniformità e semplificare configurazione, manutenzione e assistenza, è stato scelto di rimanere all’interno dello stesso ecosistema Ubiquiti.
+La connettività principale era basata su:
 
-La soluzione è stata progettata partendo dall’edificio principale, dove è stato installato sul tetto un Ubiquiti airMAX Rocket Prism 5AC, scelto per la capacità di coprire più plessi con un unico punto di trasmissione. Il dispositivo è stato cablato dal router principale tramite cavo Cat6 per esterni.
+* **fibra ottica a 1 Gbps**
+* router Huawei **AR651**
+* **connessione LTE di backup** per garantire ridondanza
 
-Da questo nodo principale è stata distribuita la connettività verso 4 edifici, sui quali sono stati installati come ricevitori gli Ubiquiti airMAX NanoStation 5AC Loco. In questo modo è stata realizzata una rete punto-multipunto stabile, con velocità per singolo plesso tra 200 e 300 Mbps in download, sufficiente a garantire sia la rete LAN che il corretto funzionamento della rete Wi-Fi basata sugli access point AC-Lite.
+Nonostante la presenza della fibra, erano presenti:
 
-Per i due plessi rimanenti, che non erano raggiungibili in modo efficiente dalla prima tratta, è stata adottata una soluzione punto-punto dedicata utilizzando 4 Ubiquiti airMAX PowerBeam M5 300, installati sulle facciate degli edifici. Anche in questo caso il collegamento è stato realizzato tramite cablaggio Cat6 da esterno, ottenendo una banda stabile compresa tra 200 e 300 Mbps.
+* **budget limitato**
+* necessità di attivazione **rapida su 6 edifici**
 
-Dal punto di vista logico di rete, non essendo stato possibile implementare VLAN a causa dei limiti dell’infrastruttura di switching, è stata adottata una configurazione semplificata basata su indirizzi statici nella rete 192.168.48.x/22 e distribuzione DHCP da 192.168.49.x a 192.168.51.x.
+---
 
-La gestione centralizzata dell’intera infrastruttura è stata affidata a una Ubiquiti UniFi Cloud Key UC-CK, utilizzata per il controllo, la configurazione e l’aggiornamento firmware di tutti i dispositivi installati.
+### Analisi infrastruttura esistente
 
-A livello di ottimizzazione, è stata abilitata la QoS per la gestione del traffico e il bilanciamento della rete.
+È stata effettuata un’analisi dell’hardware disponibile:
 
-Il risultato finale è stata una infrastruttura wireless completa e funzionale, in grado di collegare 6 edifici senza opere di scavo, con prestazioni stabili e una gestione centralizzata semplificata.`},
+* recuperati circa **40 access point** Ubiquiti **AC-Lite**
+
+Infrastruttura di rete:
+
+* switch **Gigabit TP-Link standard**
+* **impossibilità di sostituzione o configurazione avanzata**
+* conseguente **assenza di VLAN**
+
+Per garantire:
+
+* **uniformità**
+* **facilità di gestione**
+* **manutenzione semplificata**
+
+è stato scelto di utilizzare interamente l’ecosistema Ubiquiti.
+
+---
+
+### Architettura della soluzione
+
+La rete è stata progettata partendo dall’edificio principale, dove è stato installato:
+
+* Ubiquiti **airMAX Rocket Prism 5AC**
+
+  * installazione su **tetto edificio principale**
+  * collegamento tramite **cavo Cat6 da esterno**
+  * funzione: **trasmissione punto-multipunto**
+
+---
+
+### Distribuzione verso 4 plessi
+
+Ricezione segnale tramite:
+
+* Ubiquiti **airMAX NanoStation 5AC Loco**
+
+Risultato:
+
+* **rete punto-multipunto stabile**
+* velocità per plesso: **200–300 Mbps**
+* supporto completo a:
+
+  * **rete LAN**
+  * **rete Wi-Fi (AC-Lite)**
+
+---
+
+### Collegamenti dedicati per 2 plessi
+
+Per i plessi non coperti direttamente:
+
+* Ubiquiti **airMAX PowerBeam M5 300 (4 unità)**
+
+  * installazione su **facciate edifici**
+  * collegamento tramite **Cat6 da esterno**
+  * architettura: **punto-punto dedicato**
+
+Prestazioni:
+
+* **200–300 Mbps stabili per plesso**
+
+---
+
+### Configurazione rete
+
+A causa dei limiti dell’infrastruttura:
+
+* **VLAN non implementabili**
+
+È stata adottata una configurazione semplificata:
+
+* rete statica: **192.168.48.x/22**
+* DHCP:
+
+  * **192.168.49.x – 192.168.51.x**
+
+---
+
+### Gestione e ottimizzazione
+
+Gestione centralizzata tramite:
+
+* Ubiquiti **UniFi Cloud Key UC-CK**
+
+Funzionalità:
+
+* **configurazione dispositivi**
+* **monitoraggio rete**
+* **aggiornamenti firmware**
+
+Ottimizzazione:
+
+* **QoS abilitata**
+* **bilanciamento traffico di rete**
+
+---
+
+### Risultato finale
+
+* **6 edifici collegati senza scavi**
+* **infrastruttura wireless stabile e scalabile**
+* prestazioni medie: **200–300 Mbps per plesso**
+* **gestione centralizzata semplificata**
+* riduzione dei costi grazie al riutilizzo hardware
+
+---`},
       {
         id: 'fesr-pon',
         title: 'Progetto FESR/PON — Infrastruttura Scolastica Chiavi in Mano',
@@ -507,12 +633,239 @@ Il risultato finale è stata una infrastruttura wireless completa e funzionale, 
         badge: 'Infrastruttura Rete',
         badgeClass: 'infra',
         disabled: false,
-        isNew: false,
-        order: 2,
+        isNew: true,
+        order: 1,
         headerHTML: '<div class="card-tech-header header-firewall"><div class="brand-showcase"><div class="brand-item"><div class="brand-icon"><i class="fas fa-shield-alt"></i></div><span class="brand-label">FortiGate</span></div><div class="brand-item"><div class="brand-icon zyxel"><i class="fas fa-lock"></i></div><span class="brand-label">Zyxel</span></div><div class="brand-item"><div class="brand-icon watchguard"><i class="fas fa-eye"></i></div><span class="brand-label">WatchGuard</span></div><div class="brand-item"><div class="brand-icon" style="background:rgba(229,137,0,0.10);color:#e58900;"><i class="fas fa-circle-nodes"></i></div><span class="brand-label" style="color:#e58900;">UDM Pro</span></div><div class="brand-item"><div class="brand-icon" style="background:rgba(100,140,220,0.08);color:#8ab4f8;"><i class="fas fa-key"></i></div><span class="brand-label" style="color:#8899bb;">SSL-VPN</span></div></div></div>',
-        gallery: [],
-        articleHTML: '<h3>Descrizione</h3><p>Scrivi qui il tuo articolo (testo a mano) sul progetto FESR/PON.</p>'
-      },
+        gallery: [
+          'assets/articles/fesr-pon/1400759134_1052521.jpg',
+          'assets/articles/fesr-pon/qnap.jpg',
+          'assets/articles/fesr-pon/dell.png',
+          'assets/articles/fesr-pon/Immagine_2026-04-25_153403.png',
+          'assets/articles/fesr-pon/uck2.png',
+          'assets/articles/fesr-pon/sw.png',
+          'assets/articles/fesr-pon/udmpro.png',
+          'assets/articles/fesr-pon/61U3o4lIUsL._AC_UF894_1000_QL80_.jpg',
+          'assets/articles/fesr-pon/VPN1000-zyxel.png',
+          'assets/articles/fesr-pon/fortigate-fortiwifi-60f.png'
+        ],
+        article: `Per il seguente progetto sono stati stanziati fondi dall’Unione Europea per il **cablaggio strutturato** e la realizzazione di nuove **infrastrutture di rete** all’interno degli istituti scolastici. Ho gestito direttamente **5 scuole (4 istituti comprensivi e 1 liceo superiore)**, per un totale di **13 edifici**.
+
+La progettazione è stata sviluppata analizzando le **esigenze specifiche** di ciascun plesso: alcune strutture richiedevano una **copertura Wi-Fi completa per la didattica digitale**, mentre altre necessitavano anche di un **potenziamento della rete LAN** per laboratori e uffici di segreteria.
+
+---
+
+### Infrastruttura Wi-Fi e rete cablata
+
+Per la componente didattica è stata realizzata una copertura wireless completa tramite access point Ubiquiti UniFi di ultima generazione (**U6 Long Range** e **U6 Pro**), garantendo **copertura uniforme e prestazioni elevate**.
+
+La rete cablata è stata organizzata per piano tramite switch PoE da 24 porte:
+
+* Ubiquiti **USW-24 PoE (16 porte PoE)**
+
+con **alimentazione diretta degli access point**, riduzione del cablaggio e gestione semplificata.
+
+La gestione centralizzata è stata affidata a:
+
+* Ubiquiti **UniFi Cloud Key Gen2**
+
+per **monitoraggio, configurazione e aggiornamenti firmware**.
+
+---
+
+### Sicurezza, segmentazione e controllo traffico
+
+A livello di sicurezza perimetrale sono stati installati firewall dedicati:
+
+* WatchGuard **Firebox T40**
+* Fortinet **FortiGate 60W**
+
+con implementazione di:
+
+* **segmentazione rete (didattica / segreteria)**
+* **policy firewall restrittive** (isolamento completo tra VLAN)
+* **VPN SSL** per accesso remoto sicuro
+* **failover WAN automatico**
+* **filtri contenuti** (social, gioco d’azzardo, contenuti per adulti)
+* **Safe Search forzato**
+* utilizzo di **DNS sicuri**
+* **logging completo del traffico**
+
+Il **bilanciamento del carico** è stato gestito sia lato firewall che tramite controller UniFi per la parte Wi-Fi.
+
+---
+
+### Caso specifico: Liceo superiore (architettura avanzata)
+
+Per il liceo superiore è stata progettata un’architettura più avanzata, integrando infrastrutture già esistenti.
+
+In particolare:
+
+* firewall esistente:
+
+  * Zyxel **VPN100**
+* layer aggiuntivo per la didattica:
+
+  * Ubiquiti **UDM-Pro**
+
+L’UDM-Pro gestiva esclusivamente la **rete didattica**, con:
+
+* **linea primaria filtrata** dal firewall Zyxel
+* **linea secondaria di backup** (failover)
+
+Il collegamento tra plessi è stato realizzato tramite:
+
+* **uplink in fibra SFP a 10 Gbps**
+
+Nei rack esistenti sono stati sostituiti gli switch con modelli **Layer 3**, permettendo:
+
+* creazione di **VLAN**
+* **controllo avanzato del traffico**
+* gestione degli **indirizzi IP per segmento**
+
+Nel plesso adiacente sono stati inoltre realizzati:
+
+* **laboratorio informatico**
+* **sala podcast**
+
+Entrambi dotati di:
+
+* **armadio rack dedicato**
+* switch **TP-Link Layer 2 24 porte Gigabit**
+* **24 punti rete per ambiente**
+* copertura Wi-Fi tramite U6 Pro
+
+---
+
+### Caso specifico: Upgrade segreteria (server, virtualizzazione e accesso remoto)
+
+In uno degli istituti è stato effettuato un **upgrade completo della segreteria**, con l’obiettivo di:
+
+* centralizzare i dati
+* garantire **accesso remoto sicuro**
+* evitare la **fuoriuscita dei dati** dalla rete scolastica
+
+#### Infrastruttura installata
+
+* Firewall:
+
+  * Fortinet **FortiGate 60F**
+
+* Server:
+
+  * Dell **PowerEdge T350**
+  * CPU **Intel Xeon E-2314 (4 core)**
+  * **32 GB RAM**
+  * **2 HDD SAS 600GB in RAID 1**
+  * **iDRAC per gestione remota**
+  * Sistema operativo Windows Server 2022
+
+* Continuità elettrica:
+
+  * Legrand **UPS Daker DK+**
+
+* Storage:
+
+  * 2 NAS QNAP **TS-231 (RAID 1)**
+
+---
+
+### Virtualizzazione e gestione utenti
+
+È stato configurato **Hyper-V** con 3 macchine virtuali:
+
+* **Domain Controller (Active Directory)**
+* **File Server (dati segreteria)**
+* **Macchina Windows 10/11 per accesso remoto**
+
+Sul file server sono state create:
+
+* **cartelle utente personali**
+* **cartelle condivise di segreteria**
+
+Sul Domain Controller sono state implementate:
+
+* **Group Policy (GPO)**
+* **redirect cartelle (Desktop e Documenti)**
+
+con centralizzazione completa dei dati e possibilità di accesso da qualsiasi postazione.
+
+---
+
+### Accesso remoto sicuro
+
+È stata implementata una soluzione di accesso remoto tramite:
+
+* **VPN SSL** su firewall FortiGate
+* client:
+
+  * FortiClient VPN
+
+Flusso operativo:
+
+1. Connessione alla rete tramite **VPN**
+2. Accesso via **RDP** alla macchina virtuale
+3. Autenticazione tramite **Active Directory**
+4. Accesso ai dati centralizzati
+
+Gestione tramite **licenze User CAL**.
+
+Questa soluzione ha permesso:
+
+* accesso da remoto anche con PC locali spenti
+* utilizzo di **software legacy locali**
+* mantenimento dei dati **all’interno della rete scolastica**
+
+---
+
+### Sistema di backup e continuità operativa
+
+È stato implementato un sistema di backup strutturato e ridondato.
+
+Software utilizzato:
+
+* Veeam Backup & Replication
+
+Configurato per:
+
+* backup della **VM dati**
+* backup della **VM di backup**
+* backup della **VM Domain Controller**
+
+Destinazione:
+
+* NAS primario QNAP TS-231
+
+In aggiunta:
+
+* **backup completo giornaliero** di Windows Server 2022
+* destinazione:
+
+  * secondo NAS QNAP TS-231
+* protocollo:
+
+  * **SMB (Windows)**
+
+Questa architettura ha garantito:
+
+* **ridondanza dei dati**
+* **separazione dei livelli di backup**
+* **alta resilienza** in caso di guasti
+
+---
+
+### Risultato finale
+
+È stata realizzata un’infrastruttura completa che integra:
+
+* **networking avanzato**
+* **sicurezza perimetrale e segmentazione**
+* **virtualizzazione server**
+* **accesso remoto sicuro**
+* **backup e continuità operativa**
+
+Il progetto ha permesso di ottenere una rete **scalabile, sicura e performante**, in grado di supportare sia la didattica digitale che le attività amministrative.
+
+---`},
       {
         id: 'ad-radius',
         title: 'Active Directory, GPO e FreeRADIUS con Google Workspace',
@@ -646,6 +999,41 @@ Il risultato finale è stata una infrastruttura wireless completa e funzionale, 
 
     function renderInlineTokens(text) {
       var out = String(text);
+
+      function kwHue(word) {
+        var w = String(word || '').toLowerCase();
+        var h = 0;
+        for (var i = 0; i < w.length; i++) h = (h * 31 + w.charCodeAt(i)) >>> 0;
+        return h % 360;
+      }
+
+      function kwStyle(type, word) {
+        var t = String(type || '').toLowerCase();
+        if (t === 'vendor') return 'color:#c8a55c;font-weight:900;';
+        if (t === 'tech') return 'color:#7ee787;font-weight:900;';
+        if (t === 'note') return 'color:#8ab4f8;font-weight:900;';
+        if (t === 'warn') return 'color:#ffb86b;font-weight:900;';
+        var hue = kwHue(word);
+        return 'color:hsl(' + hue + ',85%,70%);font-weight:900;';
+      }
+
+      // [[kw:type|text]]
+      out = out.replace(/\[\[kw:([a-z0-9_-]+)\|([\s\S]*?)\]\]/gi, function(_, t, w) {
+        var cls = String(t || 'random').toLowerCase();
+        return '<span class="kw kw-' + escapeHTML(cls) + '" style="' + kwStyle(t, w) + '">' + escapeHTML(String(w)) + '</span>';
+      });
+
+      // **bold** (do not escape inner: base text is already escaped; spans/img are safe)
+      out = out.replace(/\*\*([\s\S]+?)\*\*/g, function(_, inner) {
+        return '<strong>' + inner + '</strong>';
+      });
+
+      // #keyword / @keyword
+      out = out.replace(/(^|\s)([#@])([a-zA-Z0-9_+.-]{2,})(?=\b)/g, function(_, pre, sym, w) {
+        var hue = kwHue(w);
+        return pre + '<span style="color:hsl(' + hue + ',85%,70%);font-weight:900;">' + escapeHTML(w) + '</span>';
+      });
+
       out = out.replace(/\[\[img:([^\]]+)\]\]/gi, function(_, p1) {
         var src = String(p1 || '').trim();
         if (!src) return '';
@@ -656,19 +1044,102 @@ Il risultato finale è stata una infrastruttura wireless completa e funzionale, 
         if (!cap) return '';
         return '<div class="article-caption">' + escapeHTML(cap) + '</div>';
       });
+
+      // *italic* (basic)
+      out = out.replace(/(^|\s)\*([^*\s][^*]*?)\*(?=\s|$)/g, function(_, pre, w) {
+        return pre + '<em>' + escapeHTML(w) + '</em>';
+      });
+
       return out;
     }
 
     function renderArticle(project) {
       if (project && typeof project.article === 'string' && project.article.trim()) {
-        var text = project.article.replace(/\r\n/g, '\n').trim();
+        var raw = project.article.replace(/\r\n/g, '\n');
+        // Legacy marker cleanup (no effects attached)
+        var text = raw.replace(/\[\[wow:on\]\]\s*\n?/gi, '').trim();
         var blocks = text.split(/\n\s*\n+/g).map(function(b) { return b.trim(); }).filter(Boolean);
-        return blocks.map(function(b) {
-          var html = escapeHTML(b);
-          html = renderInlineTokens(html);
+        var outHtml = blocks.map(function(b) {
+          var lines = b.split(/\n+/g);
+          var trimmed = lines.map(function(x){ return String(x || '').trim(); }).filter(Boolean);
+
+          // Markdown heading ### -> bold line
+          if (trimmed.length === 1 && /^#{3,}\s+/.test(trimmed[0])) {
+            var t = trimmed[0].replace(/^#{3,}\s+/, '');
+            return '<p><strong>' + renderInlineTokens(escapeHTML(t)) + '</strong></p>';
+          }
+
+          function isUlLine(s) { return /^[-*•]\s*/.test(s); }
+          function isOlLine(s) { return /^(\d+)[\.)]\s+/.test(s) || /^(\d+)\s*-\s+/.test(s); }
+
+          // Markdown horizontal rule
+          if (trimmed.length === 1 && /^-{3,}$/.test(trimmed[0])) {
+            return '<hr>';
+          }
+
+          // Pattern: "Title:" followed by list-like lines (common when pasting from ChatGPT)
+          if (trimmed.length >= 3 && /:$/.test(trimmed[0])) {
+            var head = trimmed[0];
+            var rest = trimmed.slice(1);
+            var restLooksList = rest.every(function(s) {
+              if (!s) return false;
+              if (s.length > 72) return false;
+              if (/^[\.:;]$/.test(s)) return false;
+              return true;
+            });
+            if (restLooksList) {
+              var headHtml = renderInlineTokens(escapeHTML(head));
+              var items = rest.map(function(s) {
+                var itemHtml = renderInlineTokens(escapeHTML(s));
+                return '<li>' + itemHtml + '</li>';
+              }).join('');
+              return '<p>' + headHtml + '</p><ul>' + items + '</ul>';
+            }
+          }
+
+          var allUl = trimmed.length >= 2 && trimmed.every(isUlLine);
+          var allOl = trimmed.length >= 2 && trimmed.every(isOlLine);
+
+          // Heuristic: list without explicit markers (multiple short lines)
+          var looksLikeBareList = false;
+          if (!allUl && !allOl && trimmed.length >= 2) {
+            looksLikeBareList = trimmed.every(function(s) {
+              if (s.length > 64) return false;
+              if (/[\.:;]$/.test(s)) return false;
+              if (s.indexOf(':') !== -1) return false;
+              return true;
+            });
+          }
+
+          if (allUl || looksLikeBareList) {
+            var items = trimmed.map(function(s) {
+              // Allow headings inside list blocks to break the list
+              if (/^#{3,}\s+/.test(s)) {
+                return '<li><strong>' + renderInlineTokens(escapeHTML(s.replace(/^#{3,}\s+/, ''))) + '</strong></li>';
+              }
+              var body = allUl ? s.replace(/^[-*•]\s*/, '') : s;
+              var html = renderInlineTokens(escapeHTML(body));
+              html = html.replace(/\n/g, '<br>');
+              return '<li>' + html + '</li>';
+            }).join('');
+            return '<ul>' + items + '</ul>';
+          }
+
+          if (allOl) {
+            var items2 = trimmed.map(function(s) {
+              var body = s.replace(/^(\d+)[\.)]\s+/, '').replace(/^(\d+)\s*-\s+/, '');
+              var html = renderInlineTokens(escapeHTML(body));
+              html = html.replace(/\n/g, '<br>');
+              return '<li>' + html + '</li>';
+            }).join('');
+            return '<ol>' + items2 + '</ol>';
+          }
+
+          var html = renderInlineTokens(escapeHTML(b));
           html = html.replace(/\n/g, '<br>');
           return '<p>' + html + '</p>';
         }).join('');
+        return outHtml;
       }
       if (project && typeof project.articleHTML === 'string' && project.articleHTML.trim()) return project.articleHTML;
       return '<p>Articolo non ancora inserito.</p>';
@@ -686,19 +1157,42 @@ Il risultato finale è stata una infrastruttura wireless completa e funzionale, 
       }
       var nextIndex = (idx + g.length) % g.length;
       var nextSrc = g[nextIndex];
+      var stage = galleryImage && galleryImage.parentElement ? galleryImage.parentElement : null;
+
+      // Cancel any in-flight transition timers
+      if (modalState._gFadeOut) { clearTimeout(modalState._gFadeOut); modalState._gFadeOut = 0; }
+      if (modalState._gFadeIn) { clearTimeout(modalState._gFadeIn); modalState._gFadeIn = 0; }
+      if (modalState._gSweepOff) { clearTimeout(modalState._gSweepOff); modalState._gSweepOff = 0; }
+
+      // Phase 1: start fade-out (keep current image visible, then fade)
+      if (stage) {
+        stage.classList.remove('is-switching');
+        void stage.offsetWidth;
+        stage.classList.add('is-switching');
+      }
       galleryImage.classList.add('is-switching');
+
+      // Turn off sweep after its animation duration
+      modalState._gSweepOff = setTimeout(function() {
+        if (stage) stage.classList.remove('is-switching');
+      }, 740);
+
+      // Preload next image, then swap while still faded
       var pre = new Image();
-      pre.onload = function() {
+      var applySwap = function() {
         modalState.index = nextIndex;
         galleryImage.src = nextSrc;
         galleryImage.alt = modalState.project.title + ' — immagine ' + (modalState.index + 1) + ' di ' + g.length;
-        requestAnimationFrame(function() { galleryImage.classList.remove('is-switching'); });
+        // Phase 2: fade-in after a short tick to ensure src applied
+        modalState._gFadeIn = setTimeout(function() {
+          galleryImage.classList.remove('is-switching');
+        }, 30);
+      };
+      pre.onload = function() {
+        modalState._gFadeOut = setTimeout(applySwap, 220);
       };
       pre.onerror = function() {
-        modalState.index = nextIndex;
-        galleryImage.src = nextSrc;
-        galleryImage.alt = modalState.project.title + ' — immagine ' + (modalState.index + 1) + ' di ' + g.length;
-        requestAnimationFrame(function() { galleryImage.classList.remove('is-switching'); });
+        modalState._gFadeOut = setTimeout(applySwap, 220);
       };
       pre.src = nextSrc;
       galleryPrev.style.opacity = g.length > 1 ? '1' : '0.25';
