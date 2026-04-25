@@ -139,6 +139,8 @@
     .modal-overlay.active.opening{animation:overlayIn 220ms ease-out both;}
     .modal-overlay.active.closing{animation:overlayOut 180ms ease-in both;}
     .modal{width:min(1040px,100%);height:min(88vh,920px);background:rgba(24,24,24,0.92);border:1px solid rgba(255,255,255,0.08);border-radius:18px;box-shadow:0 30px 120px rgba(0,0,0,0.65);overflow:hidden;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(360px,0.85fr);}
+    .modal.no-gallery{grid-template-columns:1fr;}
+    .modal.no-gallery .modal-right{border-left:none;min-width:0;}
     .modal-overlay.active.opening .modal{animation:modalIn 260ms cubic-bezier(0.2,0.9,0.2,1) both;}
     .modal-overlay.active.closing .modal{animation:modalOut 180ms ease-in both;}
     @keyframes overlayIn{from{opacity:0;}to{opacity:1;}}
@@ -180,10 +182,15 @@
     .thumb{width:74px;height:52px;border-radius:12px;flex:0 0 auto;object-fit:cover;border:1px solid rgba(255,255,255,0.10);opacity:0.7;cursor:pointer;transition:opacity 0.2s ease,border-color 0.2s ease,transform 0.2s ease;}
     .thumb:hover{opacity:1;transform:translateY(-1px);}
     .thumb.active{opacity:1;border-color:rgba(200,165,92,0.55);}
+
+    body.custom-cursor,
+    body.custom-cursor *{cursor:none !important;}
     .modal-meta{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 18px;}
     .modal-body{font-size:0.92rem;line-height:1.9;color:var(--fg-muted);overflow-wrap:break-word;word-break:normal;hyphens:auto;}
     .modal-body h3{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--fg);margin:18px 0 8px;}
     .modal-body p{margin:10px 0;}
+    .modal-body pre{margin:12px 0;padding:14px 14px;border-radius:14px;border:1px solid rgba(255,255,255,0.10);background:rgba(255,255,255,0.04);overflow:auto;line-height:1.55;}
+    .modal-body pre code{display:block;white-space:pre;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:12.5px;color:rgba(240,236,228,0.92);}
     .modal-body .article-img{width:100%;height:auto;display:block;border-radius:14px;border:1px solid rgba(255,255,255,0.10);background:rgba(12,12,12,0.25);margin:14px 0;}
     .modal-body .article-caption{margin-top:-8px;margin-bottom:12px;font-size:0.82rem;color:rgba(240,236,228,0.70);}
     .modal-body ul{margin:10px 0 10px 18px;color:var(--fg-muted);}
@@ -257,8 +264,8 @@
       <header class="hero-cv">
         <div class="hero-header-row">
           <div class="profile-img-wrap">
-            <img class="profile-img" id="profile-img"
-                 src="https://z-cdn-media.chatglm.cn/files/439f2c0e-23f1-4092-ad5f-b3735471283e.png?auth_key=1876896783-fd258df9096a44459d1012bcc25c6c96-0-e824b9797d1fe2b3bb7faff65f93deb1"
+            <img class="profile-img" id="profile-img" crossorigin="anonymous"
+                 src="/assets/profile.jpg"
                  onload="this.style.display='block';document.getElementById('profile-fallback').style.display='none';"
                  onerror="this.style.display='none';document.getElementById('profile-fallback').style.display='flex';">
             <div class="profile-fallback" id="profile-fallback">NC</div>
@@ -886,7 +893,7 @@ Il progetto ha permesso di ottenere una rete **scalabile, sicura e performante**
 ---`},
       {
         id: 'ad-radius',
-        title: 'Active Directory, GPO e FreeRADIUS con Google Workspace',
+        title: 'Autenticazione Wi-Fi Enterprise tramite Google Workspace (RADIUS + LDAP)',
         desc: "Implementazione di un sistema di autenticazione centralizzata e Wi-Fi enterprise.",
         tags: ['Active Directory', 'GPO', 'FreeRADIUS', 'Google Workspace', 'Windows Server', 'Debian'],
         category: 'server',
@@ -895,19 +902,18 @@ Il progetto ha permesso di ottenere una rete **scalabile, sicura e performante**
         disabled: false,
         isNew: false,
         order: 3,
-        headerHTML: '<div class="card-tech-header header-ad-google"><div class="brand-showcase"><div class="brand-item"><div class="brand-icon windows"><i class="fab fa-windows"></i></div><span class="brand-label">Windows Server</span></div><div class="brand-item"><div class="brand-icon windows" style="background:rgba(0,120,212,0.08);"><i class="fas fa-sitemap"></i></div><span class="brand-label">Active Directory</span></div><div class="brand-item"><div class="brand-icon google"><i class="fab fa-google"></i></div><span class="brand-label" style="color:#4285f4;">Google Workspace</span></div><div class="brand-item"><div class="brand-icon debian"><i class="fab fa-linux"></i></div><span class="brand-label">Debian</span></div><div class="brand-item"><div class="brand-icon" style="background:rgba(92,184,138,0.08);color:var(--success);"><i class="fas fa-wifi"></i></div><span class="brand-label" style="color:var(--success);">FreeRADIUS</span></div></div></div>',
+        headerHTML: '<div class="card-tech-header header-ad-google"><div class="brand-showcase"><div class="brand-item"><div class="brand-icon"><i class="fas fa-sitemap"></i></div><span class="brand-label">Active Directory</span></div><div class="brand-item"><div class="brand-icon"><i class="fas fa-circle"></i></div><span class="brand-label">GPO</span></div><div class="brand-item"><div class="brand-icon"><i class="fas fa-key"></i></div><span class="brand-label">FreeRADIUS</span></div><div class="brand-item"><div class="brand-icon"><i class="fas fa-circle"></i></div><span class="brand-label">Google Workspace</span></div><div class="brand-item"><div class="brand-icon"><i class="fas fa-windows"></i></div><span class="brand-label">Windows Server</span></div></div></div>',
         gallery: [],
-        articleHTML: '<h3>Obiettivo</h3><p>Scrivi qui il tuo articolo (testo a mano) su AD/GPO/FreeRADIUS.</p>'
-      },
+        article: "La scuola aveva la necessità di implementare un sistema di **autenticazione centralizzata Wi-Fi**, basato su credenziali **Google Workspace (GSuite)**, per garantire accesso sicuro e tracciato alla rete da parte di studenti e docenti.\n\n---\n\n### Infrastruttura di partenza\n\nL’istituto disponeva già di un’infrastruttura hardware di alto livello:\n\n* Server:\n\n  * Hewlett Packard Enterprise **ProLiant DL380 Gen10**\n  * CPU **Intel Xeon Silver 4110**\n  * **128 GB RAM**\n  * Storage:\n\n    * **2 SSD da 300 GB**\n    * **2 HDD SAS da 600 GB**\n\nConsiderata la potenza della macchina, è stata progettata una soluzione **scalabile e virtualizzata**, evitando di utilizzarla solo come server RADIUS.\n\n---\n\n### Architettura adottata\n\nÈ stata implementata una piattaforma di **virtualizzazione** tramite:\n\n* **Proxmox VE**\n\nAll’interno della quale è stata creata una VM dedicata:\n\n* **Debian Linux** (servizi di autenticazione)\n\n---\n\n### Implementazione RADIUS\n\nSulla macchina virtuale è stato installato:\n\n* **FreeRADIUS 3.2**\n\nConfigurazione base:\n\n* assegnazione **IP statico**\n* configurazione **client RADIUS** (AP e firewall)\n* definizione di **shared secret**\n\nEsempio configurazione:\n\n```conf\nclient unifi {\n  ipaddr = 192.168.0.0/16\n  secret = codicesegreto\n}\n```\n\n---\n\n### Integrazione con Google Workspace (LDAP)\n\nÈ stata configurata l’integrazione con:\n\n* **LDAP Google Workspace**\n\nOperazioni principali:\n\n* creazione **client LDAP** da pannello admin Google\n* generazione **credenziali e certificati**\n* configurazione accessi:\n\n  * **lettura utenti**\n  * **gruppi**\n  * **intero dominio**\n\nConfigurazione FreeRADIUS:\n\n```conf\nserver = 'ldaps://ldap.google.com'\nport = 636\n\nidentity = 'utenteLDAP'\npassword = 'passwordLDAP'\n\nbase_dn = 'dc=dominio,dc=it'\n```\n\nVerifica connessione:\n\n```bash\nldapsearch -H ldaps://ldap.google.com:636 ...\n```\n\n---\n\n### Configurazione autenticazione\n\nÈ stata implementata autenticazione tramite:\n\n* **802.1X (WPA Enterprise)**\n* protocollo:\n\n  * **EAP-TTLS**\n  * fase 2: **GTC**\n\nConfigurazioni principali:\n\n* attivazione modulo LDAP\n* modifica file:\n\n  * `sites-enabled/default`\n  * `inner-tunnel`\n  * `mods-enabled/ldap`\n  * `mods-enabled/eap`\n\nSnippet rilevante:\n\n```conf\nif (User-Password) {\n  update control {\n    Auth-Type := ldap\n  }\n}\n```\n\n---\n\n### Certificati e sicurezza\n\nSono stati generati certificati:\n\n* **self-signed (interni)**\n* validità estesa (fino a 10 anni)\n\nConfigurazione:\n\n```conf\nprivate_key_file = /etc/freeradius/certs/server.pem\ncertificate_file = /etc/freeradius/certs/server.pem\nca_file = /etc/freeradius/certs/ca.pem\n```\n\nNota:\n\n* soluzione temporanea\n* previsto utilizzo di **Let’s Encrypt** (anche in ottica **Eduroam**)\n\n---\n\n### Integrazione con infrastruttura di rete\n\nSistema integrato con:\n\n* firewall:\n\n  * Zyxel **VPN100**\n* access point:\n\n  * Zyxel (gestione centralizzata/licenze)\n\nConfigurazione Wi-Fi:\n\n* SSID: **Wireless Campus**\n* sicurezza:\n\n  * **WPA Enterprise**\n* autenticazione:\n\n  * **RADIUS**\n\n---\n\n### Flusso di autenticazione\n\n1. Connessione utente alla rete Wi-Fi\n2. Avvio autenticazione **802.1X**\n3. Richiesta inviata a **FreeRADIUS**\n4. Query verso **LDAP Google**\n5. Verifica credenziali\n6. Accesso consentito\n\n---\n\n### Debug e test\n\nStrumenti utilizzati:\n\n```bash\nradtest user@test.it password ip_server 1812 codicesegreto\n```\n\nModalità debug:\n\n```bash\n/etc/init.d/freeradius debug\n```\n\nLog:\n\n```bash\njournalctl -xe\n```\n\n---\n\n### Problematica critica: TLS 1.3 (Windows)\n\nDopo il rilascio di aggiornamenti Windows:\n\n* introduzione forzata di **TLS 1.3**\n* incompatibilità con:\n\n  * **FreeRADIUS 3.0**\n\n#### Soluzione temporanea\n\nModifica registro Windows:\n\n```\nHKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\services\\RasMan\\PPP\\EAP\\13\nDWORD TlsVersion = FC0\n```\n\n#### Soluzione definitiva\n\n* upgrade a:\n\n  * **FreeRADIUS 3.2**\n* compatibilità ripristinata\n\n---\n\n### Risultato finale\n\n* **Autenticazione Wi-Fi centralizzata tramite Google Workspace**\n* integrazione **RADIUS + LDAP**\n* accesso sicuro tramite **802.1X**\n* infrastruttura **virtualizzata e scalabile**\n* gestione utenti completamente centralizzata\n* compatibilità multi-dispositivo (Android / Windows)\n\n---\n\n### Valore tecnico del progetto\n\nQuesto progetto dimostra competenze in:\n\n* **Networking avanzato (802.1X, WPA Enterprise)**\n* **Identity integration (Google Workspace LDAP)**\n* **Linux server administration**\n* **Virtualizzazione (Proxmox)**\n* **Security e certificati**\n* **Troubleshooting avanzato (TLS, compatibilità sistemi)**\n\n---\n"},
       {
         id: 'backup-dr',
         title: 'Sistema di Backup e Disaster Recovery',
-        desc: 'Strategia completa di backup e DR con NAS e Veeam, test periodici di restore.',
+        desc: 'n sistema di autenticazione centralizzata Wi-Fi, basato su credenziali Google Workspace (GSuite),',
         tags: ['Synology NAS', 'Veeam', 'Backup Incrementale', 'Disaster Recovery', 'Virtualizzazione'],
         category: 'backup',
         badge: 'Backup & Recovery',
         badgeClass: 'backup',
-        disabled: false,
+        disabled: true,
         isNew: false,
         order: 4,
         headerHTML: '<div class="card-tech-header header-backup"><div class="brand-showcase"><div class="brand-item"><div class="brand-icon synology"><i class="fas fa-hdd"></i></div><span class="brand-label" style="color:#e06848;">Synology</span></div><div class="brand-item"><div class="brand-icon"><i class="fas fa-database"></i></div><span class="brand-label">Veeam</span></div><div class="brand-item"><div class="brand-icon" style="background:rgba(100,140,220,0.06);"><i class="fas fa-layer-group"></i></div><span class="brand-label">RAID</span></div><div class="brand-item"><div class="brand-icon" style="background:rgba(200,165,92,0.08);color:var(--accent);"><i class="fas fa-cubes"></i></div><span class="brand-label" style="color:var(--accent);">Virtualizzazione</span></div></div></div>',
@@ -954,18 +960,28 @@ Il progetto ha permesso di ottenere una rete **scalabile, sicura e performante**
       });
       projectsGrid.innerHTML = '';
       f.forEach(function(p, i) {
-        var c = document.createElement('article');
-        c.className = 'project-card reveal';
-        c.setAttribute('role', 'button');
-        c.setAttribute('tabindex', '0');
-        c.setAttribute('aria-label', 'Apri progetto: ' + p.title);
-        c.style.transitionDelay = (i * 0.1) + 's';
-        var ic = p.badgeClass === 'infra' ? 'fa-network-wired' : p.badgeClass === 'auth' ? 'fa-shield-alt' : 'fa-database';
-        var newBadge = p.isNew ? '<span class="tag" style="margin-left:10px;background:rgba(92,184,138,0.10);color:var(--success);border-color:rgba(92,184,138,0.20);">NEW</span>' : '';
-        c.innerHTML = p.headerHTML + '<div class="card-body"><div class="card-badge ' + p.badgeClass + '"><i class="fas ' + ic + '" style="font-size:0.65rem;"></i> ' + p.badge + newBadge + '</div><h3 class="card-title">' + p.title + '</h3><p class="card-desc">' + p.desc + '</p><div class="card-tags">' + p.tags.map(function(t) { return '<span class="tag">' + t + '</span>'; }).join('') + '</div></div>';
-        c.addEventListener('click', function() { openProjectModal(p); });
-        c.addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openProjectModal(p); } });
-        projectsGrid.appendChild(c);
+        try {
+          var c = document.createElement('article');
+          c.className = 'project-card reveal';
+          c.setAttribute('role', 'button');
+          c.setAttribute('tabindex', '0');
+          c.setAttribute('aria-label', 'Apri progetto: ' + (p.title || 'Progetto'));
+          c.style.transitionDelay = (i * 0.1) + 's';
+          var ic = p.badgeClass === 'infra' ? 'fa-network-wired' : p.badgeClass === 'auth' ? 'fa-shield-alt' : 'fa-database';
+          var newBadge = p.isNew ? '<span class="tag" style="margin-left:10px;background:rgba(92,184,138,0.10);color:var(--success);border-color:rgba(92,184,138,0.20);">NEW</span>' : '';
+          var tags = Array.isArray(p.tags) ? p.tags : [];
+          var headerHTML = typeof p.headerHTML === 'string' ? p.headerHTML : '';
+          var badgeClass = p.badgeClass || '';
+          var badge = p.badge || '';
+          var title = p.title || '';
+          var desc = p.desc || '';
+          c.innerHTML = headerHTML + '<div class="card-body"><div class="card-badge ' + badgeClass + '"><i class="fas ' + ic + '" style="font-size:0.65rem;"></i> ' + badge + newBadge + '</div><h3 class="card-title">' + title + '</h3><p class="card-desc">' + desc + '</p><div class="card-tags">' + tags.map(function(t) { return '<span class="tag">' + t + '</span>'; }).join('') + '</div></div>';
+          c.addEventListener('click', function() { openProjectModal(p); });
+          c.addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openProjectModal(p); } });
+          projectsGrid.appendChild(c);
+        } catch (e) {
+          console.error('Errore renderProjects per progetto:', p && p.id, e);
+        }
       });
       setTimeout(function() { triggerReveals(document.getElementById('page-progetti')); }, 50);
     }
@@ -987,7 +1003,9 @@ Il progetto ha permesso di ottenere una rete **scalabile, sicura e performante**
     var modalTags = document.getElementById('project-modal-tags');
     var modalBody = document.getElementById('project-modal-body');
     var modalClose = document.getElementById('project-modal-close');
+    var modalLeft = modalPanel ? modalPanel.querySelector('.modal-left') : null;
     var galleryImage = document.getElementById('gallery-image');
+    var galleryStage = galleryImage ? galleryImage.parentElement : null;
     var galleryThumbs = document.getElementById('gallery-thumbs');
     var galleryPrev = document.getElementById('gallery-prev');
     var galleryNext = document.getElementById('gallery-next');
@@ -1076,8 +1094,56 @@ Il progetto ha permesso di ottenere una rete **scalabile, sicura e performante**
         var raw = project.article.replace(/\r\n/g, '\n');
         // Legacy marker cleanup (no effects attached)
         var text = raw.replace(/\[\[wow:on\]\]\s*\n?/gi, '').trim();
-        var blocks = text.split(/\n\s*\n+/g).map(function(b) { return b.trim(); }).filter(Boolean);
+        // Unescape code fences stored as \`\`\` to keep JS template literals safe
+        text = text.replace(/\\`\\`\\`/g, '```');
+
+        // Extract fenced code blocks ```lang ... ``` to avoid markdown heuristics breaking code.
+        var codeBlocks = [];
+        var tLines = text.split('\n');
+        var outLines = [];
+        var inCode = false;
+        var codeLang = '';
+        var codeLines = [];
+        for (var i = 0; i < tLines.length; i++) {
+          var line = tLines[i];
+          var mFence = /^\s*```\s*([a-z0-9_-]+)?\s*$/i.exec(line);
+          if (mFence) {
+            if (!inCode) {
+              inCode = true;
+              codeLang = String(mFence[1] || '').trim();
+              codeLines = [];
+            } else {
+              var code = codeLines.join('\n');
+              var langClass = codeLang ? (' language-' + escapeHTML(codeLang)) : '';
+              codeBlocks.push('<pre><code class="code-block' + langClass + '">' + escapeHTML(code) + '</code></pre>');
+              outLines.push('\u0000CODE' + (codeBlocks.length - 1) + '\u0000');
+              inCode = false;
+              codeLang = '';
+              codeLines = [];
+            }
+            continue;
+          }
+          if (inCode) {
+            codeLines.push(line);
+            continue;
+          }
+          outLines.push(line);
+        }
+        if (inCode) {
+          var code2 = codeLines.join('\n');
+          var langClass2 = codeLang ? (' language-' + escapeHTML(codeLang)) : '';
+          codeBlocks.push('<pre><code class="code-block' + langClass2 + '">' + escapeHTML(code2) + '</code></pre>');
+          outLines.push('\u0000CODE' + (codeBlocks.length - 1) + '\u0000');
+        }
+
+        var normalized = outLines.join('\n');
+        var blocks = normalized.split(/\n\s*\n+/g).map(function(b) { return b.trim(); }).filter(Boolean);
         var outHtml = blocks.map(function(b) {
+          var onlyCode = /^\u0000CODE(\d+)\u0000$/.exec(b);
+          if (onlyCode) {
+            var idx = Number(onlyCode[1]);
+            return codeBlocks[idx] || '';
+          }
           var lines = b.split(/\n+/g);
           var trimmed = lines.map(function(x){ return String(x || '').trim(); }).filter(Boolean);
 
@@ -1271,6 +1337,13 @@ Il progetto ha permesso di ottenere una rete **scalabile, sicura e performante**
       modalTags.innerHTML = (project.tags || []).map(function(t) { return '<span class="tag">' + t + '</span>'; }).join('');
       modalBody.innerHTML = renderArticle(project);
 
+      var g = Array.isArray(project && project.gallery) ? project.gallery : [];
+      var hasGallery = g.length > 0;
+      if (modalPanel) modalPanel.classList.toggle('no-gallery', !hasGallery);
+      if (modalLeft) modalLeft.style.display = hasGallery ? '' : 'none';
+      if (galleryStage) galleryStage.style.display = hasGallery ? '' : 'none';
+      if (galleryThumbs) galleryThumbs.style.display = (g.length > 1) ? '' : 'none';
+
       buildThumbs(project);
       setGalleryIndex(0);
 
@@ -1361,287 +1434,355 @@ Il progetto ha permesso di ottenere una rete **scalabile, sicura e performante**
       var loader = document.getElementById('pdf-loading');
       loader.classList.add('active');
 
-      setTimeout(function() {
-        try {
-          var doc = new window.jspdf.jsPDF('p', 'mm', 'a4');
+      // Optional: embed local profile photo if present (avoid CORS issues)
+      function done(imageDataUrl) {
+        var doc = new window.jspdf.jsPDF('p', 'mm', 'a4');
 
-          /* Colori */
-          var gold = [200, 165, 92];
-          var dark = [26, 26, 26];
-          var gray = [85, 85, 85];
-          var ltGray = [119, 119, 119];
-          var txtGray = [68, 68, 68];
-          var txtDark = [51, 51, 51];
-          var cream = [250, 248, 244];
-          var lineGray = [221, 221, 221];
+        /* Colori */
+        var gold = [200, 165, 92];
+        var dark = [26, 26, 26];
+        var gray = [85, 85, 85];
+        var ltGray = [119, 119, 119];
+        var txtGray = [68, 68, 68];
+        var txtDark = [51, 51, 51];
+        var cream = [250, 248, 244];
+        var lineGray = [221, 221, 221];
 
-          /* Margini e layout */
-          var lm = 11, rm = 11, tm = 10;
-          var pw = 210 - lm - rm;
-          var colLW = 116, colRW = pw - colLW - 16;
+        /* Margini e layout */
+        var lm = 11, rm = 11, tm = 10;
+        var pw = 210 - lm - rm;
+        var colLW = 116, colRW = pw - colLW - 16;
+        var y = tm;
 
-          var y = tm;
+        /* === HEADER === */
+        // Avatar tondo (sicuro): immagine pre-clippata in PNG trasparente
+        var ax = lm;
+        var ay = y;
+        var as = 13;
+        var ar = as / 2;
 
-          /* === HEADER === */
-          /* Quadrato foto */
+        // cornice
+        doc.setFillColor(255, 255, 255);
+        if (doc.circle) {
+          doc.circle(ax + ar, ay + ar, ar, 'F');
+          doc.setDrawColor.apply(doc, gold);
+          doc.setLineWidth(0.6);
+          doc.circle(ax + ar, ay + ar, ar, 'S');
+        } else {
           doc.setFillColor.apply(doc, gold);
-          doc.roundedRect(lm, y, 13, 13, 2, 2, 'F');
+          doc.roundedRect(ax, ay, as, as, 6, 6, 'F');
+        }
+
+        if (imageDataUrl && doc.addImage) {
+          try {
+            // imageDataUrl is produced as PNG by the loader below
+            doc.addImage(imageDataUrl, 'PNG', ax, ay, as, as, undefined, 'FAST');
+          } catch (e) {
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(8);
+            doc.setTextColor.apply(doc, dark);
+            doc.text('NC', ax + ar, ay + 8.2, { align: 'center' });
+          }
+        } else {
           doc.setFont('helvetica', 'bold');
           doc.setFontSize(8);
           doc.setTextColor.apply(doc, dark);
-          doc.text('NC', lm + 6.5, y + 8.2, { align: 'center' });
+          doc.text('NC', ax + ar, ay + 8.2, { align: 'center' });
+        }
+        doc.setFontSize(19);
+        doc.setTextColor.apply(doc, dark);
+        doc.text('Nicola De Cristofaro', lm + 17, y + 5.5);
 
-          /* Nome */
-          doc.setFontSize(19);
-          doc.setTextColor.apply(doc, dark);
-          doc.text('Nicola De Cristofaro', lm + 17, y + 5.5);
+        doc.setFontSize(8);
+        doc.setTextColor.apply(doc, ltGray);
+        doc.text('Sistemista / Giuntista Fibra Ottica', lm + 17, y + 10.5);
 
-          /* Ruolo */
-          doc.setFontSize(8);
-          doc.setTextColor.apply(doc, ltGray);
-          doc.text('Sistemista / Giuntista Fibra Ottica', lm + 17, y + 10.5);
-
-          /* Contatti */
-          doc.setFontSize(7.4);
-          doc.setTextColor.apply(doc, gray);
-          var cx = 210 - rm;
+        // Contatti cliccabili
+        doc.setFontSize(7.4);
+        doc.setTextColor.apply(doc, gray);
+        var cx = 210 - rm;
+        if (doc.textWithLink) {
+          doc.textWithLink('nicoladecristofaro@hotmail.it', cx, y + 2.5, { align: 'right', url: 'mailto:nicoladecristofaro@hotmail.it' });
+          doc.textWithLink('nicoladecristofaro23@pec.it', cx, y + 5.8, { align: 'right', url: 'mailto:nicoladecristofaro23@pec.it' });
+          doc.textWithLink('linkedin.com/in/nicoladecristofaro', cx, y + 9.1, { align: 'right', url: 'https://linkedin.com/in/nicoladecristofaro' });
+        } else {
           doc.text('nicoladecristofaro@hotmail.it', cx, y + 2.5, { align: 'right' });
           doc.text('nicoladecristofaro23@pec.it', cx, y + 5.8, { align: 'right' });
           doc.text('linkedin.com/in/nicoladecristofaro', cx, y + 9.1, { align: 'right' });
-          doc.text('Parete (CE), Italia', cx, y + 12.4, { align: 'right' });
-
-          y += 17.5;
-
-          /* Linea oro */
-          doc.setDrawColor.apply(doc, gold);
-          doc.setLineWidth(0.7);
-          doc.line(lm, y, 210 - rm, y);
-          y += 6;
-
-          /* === COLONNA SINISTRA === */
-          var lx = lm;
-
-          /* Profilo */
-          doc.setFontSize(9);
-          doc.setFont('helvetica', 'bold');
-          doc.setTextColor.apply(doc, gold);
-          doc.text('PROFILO PROFESSIONALE', lx, y);
-          y += 1.2;
-          doc.setDrawColor.apply(doc, lineGray);
-          doc.setLineWidth(0.25);
-          doc.line(lx, y, lx + colLW, y);
-          y += 3.8;
-
-          doc.setFont('helvetica', 'normal');
-          doc.setFontSize(8.4);
-          doc.setTextColor.apply(doc, txtDark);
-          var profLines = doc.splitTextToSize('Sistemista e specialista networking con esperienza nella progettazione, gestione e troubleshooting di infrastrutture IT e reti complesse in ambito scolastico e aziendale. Competenze avanzate in reti LAN/WAN, sicurezza IT e sistemi Windows Server, con una conoscenza approfondita anche dell\u2019infrastruttura fisica di rete in fibra ottica (FTTH/GPON), per una visione completa della connettivit\u00E0 dal livello fisico fino ai servizi di rete. Focus su stabilit\u00E0 e continuit\u00E0 operativa.', colLW);
-          doc.text(profLines, lx, y);
-          y += profLines.length * 3.6 + 3;
-
-          /* Esperienza */
-          doc.setFontSize(9);
-          doc.setFont('helvetica', 'bold');
-          doc.setTextColor.apply(doc, gold);
-          doc.text('ESPERIENZA LAVORATIVA', lx, y);
-          y += 1.2;
-          doc.line(lx, y, lx + colLW, y);
-          y += 3.8;
-
-          /* Exp 1 */
-          doc.setFontSize(9);
-          doc.setTextColor.apply(doc, dark);
-          doc.text('Sistemista', lx, y);
-          doc.setFontSize(6.8);
-          doc.setTextColor(153, 153, 153);
-          doc.text('2019 \u2014 Presente', lx + colLW, y, { align: 'right' });
-          y += 3.3;
-          doc.setFontSize(7.4);
-          doc.setTextColor.apply(doc, ltGray);
-          doc.text('A.R. Informatica \u2014 RDC Services SRLS', lx, y);
-          y += 3.8;
-
-          var exp1 = [
-            'Progettazione e implementazione di infrastrutture di rete LAN/WAN per scuole e uffici',
-            'Installazione e configurazione di armadi rack e cablaggio strutturato',
-            'Configurazione switch managed e reti Wi-Fi professionali',
-            'Segmentazione di rete tramite VLAN, gestione DHCP e indirizzamento IP',
-            'Configurazione firewall (Fortinet, Zyxel, UniFi, Huawei)',
-            'Implementazione VPN (SSL/IPsec) e sicurezza perimetrale',
-            'Gestione server Windows (Active Directory, DNS, DHCP, GPO)',
-            'Sistemi di backup e disaster recovery (Veeam, NAS, cloud)',
-            'Gestione storage e configurazioni RAID',
-            'Realizzazione collegamenti tra sedi tramite infrastrutture wireless'
-          ];
-          doc.setFontSize(7.8);
-          doc.setTextColor.apply(doc, txtGray);
-          exp1.forEach(function(item) {
-            var lines = doc.splitTextToSize(item, colLW - 4);
-            lines.forEach(function(line) {
-              doc.text(line, lx + 3, y);
-              y += 3;
-            });
-            y += 0.3;
-          });
-          y += 2;
-
-          /* Exp 2 */
-          doc.setFontSize(9);
-          doc.setFont('helvetica', 'bold');
-          doc.setTextColor.apply(doc, dark);
-          doc.text('Specializzazione FTTH/GPON', lx, y);
-          doc.setFontSize(6.8);
-          doc.setTextColor(153, 153, 153);
-          doc.text('2025 \u2014 Presente', lx + colLW, y, { align: 'right' });
-          y += 3.3;
-          doc.setFontSize(7.4);
-          doc.setTextColor.apply(doc, ltGray);
-          doc.text('Open Fiber', lx, y);
-          y += 3.8;
-
-          var exp2 = [
-            'Attivit\u00E0 su infrastrutture di rete in fibra ottica per accesso a banda ultra larga',
-            'Diagnosi guasti su tratte ottiche e infrastrutture attive',
-            'Analisi e validazione qualit\u00E0 segnale su collegamenti in fibra',
-            'Interventi su reti distribuite e infrastrutture attive',
-            'Interventi su reti distribuite con topologie complesse (anello / cascata)',
-            'Ripristino di disservizi critici su infrastrutture di connettivit\u00E0',
-            'Certificazione e verifica funzionale delle tratte di rete ottica'
-          ];
-          doc.setFontSize(7.8);
-          doc.setTextColor.apply(doc, txtGray);
-          exp2.forEach(function(item) {
-            var lines = doc.splitTextToSize(item, colLW - 4);
-            lines.forEach(function(line) {
-              doc.text(line, lx + 3, y);
-              y += 3;
-            });
-            y += 0.3;
-          });
-          y += 2;
-
-          /* Obiettivo */
-          var obH = 16;
-          doc.setFillColor.apply(doc, cream);
-          doc.roundedRect(lx, y, colLW, obH, 1, 1, 'F');
-          doc.setFillColor.apply(doc, gold);
-          doc.rect(lx, y, 0.7, obH, 'F');
-
-          doc.setFontSize(8.5);
-          doc.setFont('helvetica', 'bold');
-          doc.setTextColor.apply(doc, gold);
-          doc.text('OBIETTIVO PROFESSIONALE', lx + 3.5, y + 5);
-
-          doc.setFontSize(7.6);
-          doc.setFont('helvetica', 'normal');
-          doc.setTextColor.apply(doc, txtGray);
-          var obLines = doc.splitTextToSize('Crescere come sistemista e specialista infrastrutturale di rete, lavorando su ambienti enterprise e infrastrutture distribuite, integrando competenze sistemistiche e di rete fisica per garantire affidabilit\u00E0 e continuit\u00E0 del servizio.', colLW - 7);
-          doc.text(obLines, lx + 3.5, y + 9);
-
-          /* === COLONNA DESTRA === */
-          var rx = lm + colLW + 16;
-          var ry = tm + 24;
-
-          /* Competenze */
-          doc.setFontSize(8.5);
-          doc.setFont('helvetica', 'bold');
-          doc.setTextColor.apply(doc, gold);
-          doc.text('COMPETENZE TECNICHE', rx, ry);
-          ry += 1.2;
-          doc.line(rx, ry, rx + colRW, ry);
-          ry += 3.8;
-
-          var comp = [
-            { c: 'Networking: ', v: 'VLAN, DHCP, NAT, routing base, firewall (Fortinet, Zyxel, UniFi, Huawei), VPN SSL / IPsec' },
-            { c: 'Sistemi: ', v: 'Windows Server (AD, DNS, DHCP, GPO), gestione utenti e policy, backup & disaster recovery' },
-            { c: 'Infrastrutture: ', v: 'Cablaggio strutturato e rack, reti aziendali e multi-sede, sistemi storage e RAID' },
-            { c: 'Fibra Ottica / FTTH: ', v: 'Reti GPON e infrastrutture FTTH, diagnostica guasti, verifica e collaudo tratte, topologie (primaria/secondaria)' }
-          ];
-          doc.setFontSize(7.2);
-          comp.forEach(function(item) {
-            doc.setFont('helvetica', 'bold');
-            doc.setTextColor.apply(doc, txtDark);
-            var full = item.c + item.v;
-            var lines = doc.splitTextToSize(full, colRW);
-            lines.forEach(function(line) {
-              doc.text(line, rx, ry);
-              ry += 3;
-            });
-            ry += 1.8;
-          });
-
-          ry += 0.5;
-
-          /* Soft Skills */
-          doc.setFontSize(8.5);
-          doc.setFont('helvetica', 'bold');
-          doc.setTextColor.apply(doc, gold);
-          doc.text('SOFT SKILLS', rx, ry);
-          ry += 1.2;
-          doc.line(rx, ry, rx + colRW, ry);
-          ry += 3.8;
-
-          doc.setFontSize(7.2);
-          doc.setTextColor.apply(doc, gray);
-          ['Problem solving avanzato', 'Gestione emergenze', 'Multi-tasking', 'Comunicazione tecnica', 'Adattabilit\u00E0'].forEach(function(s) {
-            doc.text('\u2022  ' + s, rx + 2, ry);
-            ry += 3.3;
-          });
-
-          ry += 2;
-
-          /* Lingue */
-          doc.setFontSize(8.5);
-          doc.setFont('helvetica', 'bold');
-          doc.setTextColor.apply(doc, gold);
-          doc.text('LINGUE', rx, ry);
-          ry += 1.2;
-          doc.line(rx, ry, rx + colRW, ry);
-          ry += 3.8;
-
-          doc.setFontSize(7.4);
-          doc.setFont('helvetica', 'bold');
-          doc.setTextColor.apply(doc, txtDark);
-          doc.text('Italiano', rx, ry);
-          doc.setFont('helvetica', 'normal');
-          doc.setTextColor.apply(doc, gray);
-          doc.text('\u2014 Madrelingua', rx + 17, ry);
-          ry += 3.8;
-          doc.setFont('helvetica', 'bold');
-          doc.setTextColor.apply(doc, txtDark);
-          doc.text('Inglese', rx, ry);
-          doc.setFont('helvetica', 'normal');
-          doc.setTextColor.apply(doc, gray);
-          doc.text('\u2014 B1', rx + 17, ry);
-
-          ry += 5.5;
-
-          /* Interessi */
-          doc.setFontSize(8.5);
-          doc.setFont('helvetica', 'bold');
-          doc.setTextColor.apply(doc, gold);
-          doc.text('INTERESSI', rx, ry);
-          ry += 1.2;
-          doc.line(rx, ry, rx + colRW, ry);
-          ry += 3.8;
-
-          doc.setFontSize(7.2);
-          doc.setTextColor.apply(doc, gray);
-          doc.text('Informatica, Networking, Fibra Ottica,', rx, ry);
-          ry += 3;
-          doc.text('Motorsport, Videogiochi, Lettura', rx, ry);
-
-          /* Salva */
-          doc.save('Curriculum_Nicola_De_Cristofaro.pdf');
-          loader.classList.remove('active');
-          showToast('PDF scaricato con successo!', 'fa-check-circle');
-
-        } catch (err) {
-          loader.classList.remove('active');
-          console.error('Errore PDF:', err);
-          showToast('Errore nella generazione del PDF.', 'fa-exclamation-triangle');
         }
-      }, 200);
+        doc.text('Parete (CE), Italia', cx, y + 12.4, { align: 'right' });
+
+        y += 17.5;
+        doc.setDrawColor.apply(doc, gold);
+        doc.setLineWidth(0.7);
+        doc.line(lm, y, 210 - rm, y);
+        y += 6;
+
+        var lx = lm;
+
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor.apply(doc, gold);
+        doc.text('PROFILO PROFESSIONALE', lx, y);
+        y += 1.2;
+        doc.setDrawColor.apply(doc, lineGray);
+        doc.setLineWidth(0.25);
+        doc.line(lx, y, lx + colLW, y);
+        y += 3.8;
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8.4);
+        doc.setTextColor.apply(doc, txtDark);
+        var profLines = doc.splitTextToSize('Sistemista e specialista networking con esperienza nella progettazione, gestione e troubleshooting di infrastrutture IT e reti complesse in ambito scolastico e aziendale. Competenze avanzate in reti LAN/WAN, sicurezza IT e sistemi Windows Server, con una conoscenza approfondita anche dell\u2019infrastruttura fisica di rete in fibra ottica (FTTH/GPON), per una visione completa della connettivit\u00E0 dal livello fisico fino ai servizi di rete. Focus su stabilit\u00E0 e continuit\u00E0 operativa.', colLW);
+        doc.text(profLines, lx, y);
+        y += profLines.length * 3.6 + 3;
+
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor.apply(doc, gold);
+        doc.text('ESPERIENZA LAVORATIVA', lx, y);
+        y += 1.2;
+        doc.line(lx, y, lx + colLW, y);
+        y += 3.8;
+
+        doc.setFontSize(9);
+        doc.setTextColor.apply(doc, dark);
+        doc.text('Sistemista', lx, y);
+        doc.setFontSize(6.8);
+        doc.setTextColor(153, 153, 153);
+        doc.text('2019 — Presente', lx + colLW, y, { align: 'right' });
+        y += 3.3;
+        doc.setFontSize(7.4);
+        doc.setTextColor.apply(doc, ltGray);
+        doc.text('A.R. Informatica — RDC Services SRLS', lx, y);
+        y += 3.8;
+
+        var exp1 = [
+          'Progettazione e implementazione di infrastrutture di rete LAN/WAN per scuole e uffici',
+          'Installazione e configurazione di armadi rack e cablaggio strutturato',
+          'Configurazione switch managed e reti Wi-Fi professionali',
+          'Segmentazione di rete tramite VLAN, gestione DHCP e indirizzamento IP',
+          'Configurazione firewall (Fortinet, Zyxel, UniFi, Huawei)',
+          'Implementazione VPN (SSL/IPsec) e sicurezza perimetrale',
+          'Gestione server Windows (Active Directory, DNS, DHCP, GPO)',
+          'Sistemi di backup e disaster recovery (Veeam, NAS, cloud)',
+          'Gestione storage e configurazioni RAID',
+          'Realizzazione collegamenti tra sedi tramite infrastrutture wireless'
+        ];
+        doc.setFontSize(7.8);
+        doc.setTextColor.apply(doc, txtGray);
+        exp1.forEach(function(item) {
+          var lines = doc.splitTextToSize(item, colLW - 4);
+          lines.forEach(function(line) {
+            doc.text(line, lx + 3, y);
+            y += 3;
+          });
+          y += 0.3;
+        });
+        y += 2;
+
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor.apply(doc, dark);
+        doc.text('Specializzazione FTTH/GPON', lx, y);
+        doc.setFontSize(6.8);
+        doc.setTextColor(153, 153, 153);
+        doc.text('2025 — Presente', lx + colLW, y, { align: 'right' });
+        y += 3.3;
+        doc.setFontSize(7.4);
+        doc.setTextColor.apply(doc, ltGray);
+        doc.text('Open Fiber', lx, y);
+        y += 3.8;
+
+        var exp2 = [
+          'Attività su infrastrutture di rete in fibra ottica per accesso a banda ultra larga',
+          'Diagnosi guasti su tratte ottiche e infrastrutture attive',
+          'Analisi e validazione qualità segnale su collegamenti in fibra',
+          'Interventi su reti distribuite e infrastrutture attive',
+          'Interventi su reti distribuite con topologie complesse (anello / cascata)',
+          'Ripristino di disservizi critici su infrastrutture di connettività',
+          'Certificazione e verifica funzionale delle tratte di rete ottica'
+        ];
+        doc.setFontSize(7.8);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor.apply(doc, txtGray);
+        exp2.forEach(function(item) {
+          var lines = doc.splitTextToSize(item, colLW - 4);
+          lines.forEach(function(line) {
+            doc.text(line, lx + 3, y);
+            y += 3;
+          });
+          y += 0.3;
+        });
+        y += 2;
+
+        var obH = 16;
+        doc.setFillColor.apply(doc, cream);
+        doc.roundedRect(lx, y, colLW, obH, 1, 1, 'F');
+        doc.setFillColor.apply(doc, gold);
+        doc.rect(lx, y, 0.7, obH, 'F');
+
+        doc.setFontSize(8.5);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor.apply(doc, gold);
+        doc.text('OBIETTIVO PROFESSIONALE', lx + 3.5, y + 5);
+
+        doc.setFontSize(7.6);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor.apply(doc, txtGray);
+        var obLines = doc.splitTextToSize('Crescere come sistemista e specialista infrastrutturale di rete, lavorando su ambienti enterprise e infrastrutture distribuite, integrando competenze sistemistiche e di rete fisica per garantire affidabilità e continuità del servizio.', colLW - 7);
+        doc.text(obLines, lx + 3.5, y + 9);
+
+        var rx = lm + colLW + 16;
+        var ry = tm + 24;
+
+        doc.setFontSize(8.5);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor.apply(doc, gold);
+        doc.text('COMPETENZE TECNICHE', rx, ry);
+        ry += 1.2;
+        doc.line(rx, ry, rx + colRW, ry);
+        ry += 3.8;
+
+        var comp = [
+          { c: 'Networking: ', v: 'VLAN, DHCP, NAT, routing base, firewall (Fortinet, Zyxel, UniFi, Huawei), VPN SSL / IPsec' },
+          { c: 'Sistemi: ', v: 'Windows Server (AD, DNS, DHCP, GPO), gestione utenti e policy, backup & disaster recovery' },
+          { c: 'Infrastrutture: ', v: 'Cablaggio strutturato e rack, reti aziendali e multi-sede, sistemi storage e RAID' },
+          { c: 'Fibra Ottica / FTTH: ', v: 'Reti GPON e infrastrutture FTTH, diagnostica guasti, verifica e collaudo tratte, topologie (primaria/secondaria)' }
+        ];
+        doc.setFontSize(7.2);
+        comp.forEach(function(item) {
+          doc.setFont('helvetica', 'bold');
+          doc.setTextColor.apply(doc, txtDark);
+          var full = item.c + item.v;
+          var lines = doc.splitTextToSize(full, colRW);
+          lines.forEach(function(line) {
+            doc.text(line, rx, ry);
+            ry += 3;
+          });
+          ry += 1.8;
+        });
+
+        ry += 0.5;
+
+        doc.setFontSize(8.5);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor.apply(doc, gold);
+        doc.text('SOFT SKILLS', rx, ry);
+        ry += 1.2;
+        doc.line(rx, ry, rx + colRW, ry);
+        ry += 3.8;
+
+        doc.setFontSize(7.2);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor.apply(doc, gray);
+        ['Problem solving avanzato', 'Gestione emergenze', 'Multi-tasking', 'Comunicazione tecnica', 'Adattabilità'].forEach(function(s) {
+          doc.text('•  ' + s, rx + 2, ry);
+          ry += 3.3;
+        });
+
+        ry += 2;
+
+        doc.setFontSize(8.5);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor.apply(doc, gold);
+        doc.text('LINGUE', rx, ry);
+        ry += 1.2;
+        doc.line(rx, ry, rx + colRW, ry);
+        ry += 3.8;
+
+        doc.setFontSize(7.4);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor.apply(doc, txtDark);
+        doc.text('Italiano', rx, ry);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor.apply(doc, gray);
+        doc.text('— Madrelingua', rx + 17, ry);
+        ry += 3.8;
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor.apply(doc, txtDark);
+        doc.text('Inglese', rx, ry);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor.apply(doc, gray);
+        doc.text('— B1', rx + 17, ry);
+
+        ry += 5.5;
+
+        doc.setFontSize(8.5);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor.apply(doc, gold);
+        doc.text('INTERESSI', rx, ry);
+        ry += 1.2;
+        doc.line(rx, ry, rx + colRW, ry);
+        ry += 3.8;
+
+        doc.setFontSize(7.2);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor.apply(doc, gray);
+        doc.text('Informatica, Networking, Fibra Ottica,', rx, ry);
+        ry += 3;
+        doc.text('Motorsport, Videogiochi, Lettura', rx, ry);
+
+        doc.save('Curriculum_Nicola_De_Cristofaro.pdf');
+        loader.classList.remove('active');
+        showToast('PDF scaricato con successo!', 'fa-check-circle');
+      }
+
+      (function loadProfileImageDataUrl() {
+        var candidates = ['/assets/profile.jpg', '/assets/profile.png', 'assets/profile.jpg', 'assets/profile.png'];
+        function tryNext(i) {
+          if (i >= candidates.length) return done(null);
+          fetch(candidates[i], { cache: 'no-store' }).then(function(r) {
+            if (!r.ok) throw new Error('no image');
+            return r.blob();
+          }).then(function(blob) {
+            // Convert to circular PNG (transparent corners) so jsPDF doesn't need clip()
+            var imgUrl = URL.createObjectURL(blob);
+            var img = new Image();
+            img.onload = function() {
+              try {
+                var s = Math.min(img.naturalWidth || img.width, img.naturalHeight || img.height);
+                var canvas = document.createElement('canvas');
+                canvas.width = s;
+                canvas.height = s;
+                var ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, s, s);
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(s / 2, s / 2, s / 2, 0, Math.PI * 2);
+                ctx.closePath();
+                ctx.clip();
+                var sx = ((img.naturalWidth || img.width) - s) / 2;
+                var sy = ((img.naturalHeight || img.height) - s) / 2;
+                ctx.drawImage(img, sx, sy, s, s, 0, 0, s, s);
+                ctx.restore();
+                var png = canvas.toDataURL('image/png');
+                URL.revokeObjectURL(imgUrl);
+                done(png);
+              } catch (e) {
+                URL.revokeObjectURL(imgUrl);
+                // fallback: still try raw data URL
+                var fr = new FileReader();
+                fr.onload = function() { done(String(fr.result || '')); };
+                fr.onerror = function() { tryNext(i + 1); };
+                fr.readAsDataURL(blob);
+              }
+            };
+            img.onerror = function() {
+              try { URL.revokeObjectURL(imgUrl); } catch (e) {}
+              tryNext(i + 1);
+            };
+            img.src = imgUrl;
+          }).catch(function() {
+            tryNext(i + 1);
+          });
+        }
+        tryNext(0);
+      })();
+    }
+
+    function downloadCV_Legacy() {
+      return downloadCV();
     }
 
     /* ==============================================
@@ -1665,6 +1806,7 @@ Il progetto ha permesso di ottenere una rete **scalabile, sicura e performante**
        CURSORE (solo desktop)
        ============================================== */
     if (window.matchMedia('(pointer: fine)').matches && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      document.body.classList.add('custom-cursor');
       var cursor = document.createElement('div');
       cursor.style.cssText = 'position:fixed;width:18px;height:18px;border-radius:50%;border:2px solid var(--accent);pointer-events:none;z-index:9999;transition:transform 0.15s ease,opacity 0.15s ease;transform:translate(-50%,-50%);mix-blend-mode:difference;opacity:0;';
       document.body.appendChild(cursor);

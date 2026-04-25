@@ -55,6 +55,8 @@
     .article-preview{min-height:340px;max-height:540px;overflow:auto;padding:12px 12px;border-radius:12px;border:1px solid var(--border);background:#0e0f12;color:rgba(220,216,210,0.92);line-height:1.8;}
     .article-preview p{margin:0 0 12px;}
     .article-preview code{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);padding:2px 6px;border-radius:8px;}
+    .article-preview pre{margin:0 0 12px;padding:12px 12px;border-radius:12px;border:1px solid rgba(255,255,255,0.10);background:rgba(255,255,255,0.04);overflow:auto;line-height:1.55;}
+    .article-preview pre code{display:block;white-space:pre;font-size:12.5px;background:transparent;border:none;padding:0;border-radius:0;}
     .article-preview ul,.article-preview ol{margin:0 0 12px 20px;padding:0;}
     .article-preview li{margin:6px 0;}
     .article-preview .kw{font-weight:900;}
@@ -650,6 +652,9 @@
     let html = '';
     let mode = null; // 'ul' | 'ol'
     let para = [];
+    let inCode = false;
+    let codeLang = '';
+    let codeLines = [];
 
     function flushPara() {
       if (!para.length) return;
@@ -669,9 +674,39 @@
       mode = null;
     }
 
+    function flushCode() {
+      if (!inCode) return;
+      const code = codeLines.join('\n');
+      const langClass = codeLang ? (' language-' + escapeHtml(codeLang)) : '';
+      html += '<pre><code class="code-block' + langClass + '">' + escapeHtml(code) + '</code></pre>';
+      inCode = false;
+      codeLang = '';
+      codeLines = [];
+    }
+
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       const trimmed = line.trim();
+
+      const mFence = /^\s*```\s*([a-z0-9_-]+)?\s*$/i.exec(line);
+      if (mFence) {
+        flushPara();
+        closeList();
+        if (!inCode) {
+          inCode = true;
+          codeLang = (mFence[1] || '').trim();
+          codeLines = [];
+        } else {
+          flushCode();
+        }
+        continue;
+      }
+
+      if (inCode) {
+        codeLines.push(line);
+        continue;
+      }
+
       if (!trimmed) {
         flushPara();
         closeList();
@@ -712,9 +747,9 @@
       para.push(line);
     }
 
+    flushCode();
     flushPara();
     closeList();
-
     elPrev.innerHTML = html || '<p class="muted">Anteprima: incolla o scrivi del testo nell\'articolo.</p>';
   }
 

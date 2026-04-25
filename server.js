@@ -125,7 +125,18 @@ function ensureDir(p) {
 }
 
 function escapeForTemplateLiteral(s) {
-  return String(s)
+  let out = String(s)
+    // Users may paste text that already contains escaped backticks (\`).
+    // Normalize them back to raw backticks first, then we will re-escape safely.
+    .replace(/\\`/g, '`')
+    // If a raw backtick appears right before an escaped fence, it would terminate
+    // the surrounding template literal in Curriculum.html. Normalize it.
+    .replace(/`\s*\\`\\`\\`/g, '\\`\\`\\`')
+    // Also normalize malformed patterns like: `\`\`conf (raw backtick + escaped backticks)
+    // which we have seen coming from copy/paste.
+    .replace(/`(?=\\`+)/g, '');
+
+  return out
     .replace(/\\/g, '\\\\')
     .replace(/`/g, '\\`')
     .replace(/\${/g, '\\${');
@@ -283,7 +294,9 @@ function updateProjectArticleInHtml(html, projectId, articleText) {
   const id = safeProjectId(projectId);
   if (!id) throw new Error('projectId non valido');
 
-  const escaped = escapeForTemplateLiteral(articleText);
+  // Store article as JSON string literal to avoid backtick/template-literal issues
+  // when users paste code blocks (```), inline code (`...`), etc.
+  const escaped = JSON.stringify(String(articleText || '').replace(/\r\n/g, '\n'));
   const replacement = `id: '${id}',`;
 
   const idx = html.indexOf(replacement);
@@ -296,22 +309,25 @@ function updateProjectArticleInHtml(html, projectId, articleText) {
   const chunk = html.slice(windowStart, windowEnd);
 
   const articlePropRegex = /\n\s*article\s*:\s*`[\s\S]*?`\s*(,)?/;
+  const articleJsonPropRegex = /\n\s*article\s*:\s*"(?:[^"\\]|\\.)*"\s*(,)?/;
   const articleHtmlPropRegex = /\n\s*articleHTML\s*:\s*'[^']*'\s*(,)?/;
 
   let newChunk = chunk;
   if (articlePropRegex.test(newChunk)) {
-    newChunk = newChunk.replace(articlePropRegex, `\n        article: \`${escaped}\`$1`);
+    newChunk = newChunk.replace(articlePropRegex, `\n        article: ${escaped}$1`);
+  } else if (articleJsonPropRegex.test(newChunk)) {
+    newChunk = newChunk.replace(articleJsonPropRegex, `\n        article: ${escaped}$1`);
   } else if (articleHtmlPropRegex.test(newChunk)) {
-    newChunk = newChunk.replace(articleHtmlPropRegex, `\n        article: \`${escaped}\`$1`);
+    newChunk = newChunk.replace(articleHtmlPropRegex, `\n        article: ${escaped}$1`);
   } else {
     // Insert after gallery block end if possible, else after headerHTML
     const insertAfterGallery = /\n\s*gallery\s*:\s*\[[\s\S]*?\]\s*(,?)/;
     if (insertAfterGallery.test(newChunk)) {
-      newChunk = newChunk.replace(insertAfterGallery, (m, comma) => `${m}${comma}\n        article: \`${escaped}\``);
+      newChunk = newChunk.replace(insertAfterGallery, (m, comma) => `${m}${comma}\n        article: ${escaped}`);
     } else {
       const insertAfterHeader = /\n\s*headerHTML\s*:\s*'[^']*'\s*(,?)/;
       if (insertAfterHeader.test(newChunk)) {
-        newChunk = newChunk.replace(insertAfterHeader, (m, comma) => `${m}${comma}\n        article: \`${escaped}\``);
+        newChunk = newChunk.replace(insertAfterHeader, (m, comma) => `${m}${comma}\n        article: ${escaped}`);
       } else {
         throw new Error('Non riesco a trovare un punto di inserimento per l\'articolo nel blocco del progetto');
       }
@@ -327,8 +343,11 @@ function clearProjectArticleInHtml(html, projectId) {
 
   // Clear `article` template literal if present
   const articlePropRegex = /\n\s*article\s*:\s*`[\s\S]*?`\s*(,)?/i;
+  const articleJsonPropRegex = /\n\s*article\s*:\s*"(?:[^"\\]|\\.)*"\s*(,)?/i;
   if (articlePropRegex.test(newChunk)) {
-    newChunk = newChunk.replace(articlePropRegex, '\n        article: ``$1');
+    newChunk = newChunk.replace(articlePropRegex, '\n        article: ""$1');
+  } else if (articleJsonPropRegex.test(newChunk)) {
+    newChunk = newChunk.replace(articleJsonPropRegex, '\n        article: ""$1');
   }
 
   // Clear `articleHTML` string if present
@@ -341,7 +360,7 @@ function clearProjectArticleInHtml(html, projectId) {
   if (!/\n\s*article\s*:\s*`/i.test(newChunk) && !/\n\s*articleHTML\s*:/i.test(newChunk)) {
     const anchor = /\n\s*gallery\s*:\s*\[[\s\S]*?\]\s*(,?)/i;
     if (anchor.test(newChunk)) {
-      newChunk = newChunk.replace(anchor, (m, comma) => `${m}${comma}\n        article: ```);
+      newChunk = newChunk.replace(anchor, (m, comma) => `${m}${comma}\n        article: ""`);
     }
   }
 
@@ -374,6 +393,11 @@ function getProjectWindow(html, projectId) {
 function extractArticleFromProjectChunk(chunk) {
   const m = chunk.match(/\n\s*article\s*:\s*`([\s\S]*?)`\s*(,|\n|\})/);
   if (m) return m[1];
+  // New format: JSON string literal
+  const m2 = chunk.match(/\n\s*article\s*:\s*("(?:[^"\\]|\\.)*")\s*(,|\n|\})/);
+  if (m2) {
+    try { return JSON.parse(m2[1]); } catch (e) { return ''; }
+  }
   return '';
 }
 
