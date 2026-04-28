@@ -142,13 +142,20 @@
     .modal.no-gallery{grid-template-columns:1fr;}
     .modal.no-gallery .modal-right{border-left:none;min-width:0;}
     .modal-overlay.active.opening .modal{animation:modalIn 260ms cubic-bezier(0.2,0.9,0.2,1) both;}
+    .modal.pre-cinematic #project-modal-tags,
+    .modal.pre-cinematic #project-modal-body-inner{opacity:0;filter:blur(6px);}
+    .modal.cinematic #project-modal-tags{animation:modalSoftFadeIn 520ms ease-out both;will-change:opacity,filter;}
+    .modal.cinematic #project-modal-body-inner{animation:modalSoftFadeIn 820ms ease-out both;will-change:opacity,filter;}
+    .modal.cinematic .modal-left{animation:modalLeftIn 520ms cubic-bezier(0.2,0.9,0.2,1) both;}
     .modal-overlay.active.closing .modal{animation:modalOut 180ms ease-in both;}
     @keyframes overlayIn{from{opacity:0;}to{opacity:1;}}
     @keyframes overlayOut{from{opacity:1;}to{opacity:0;}}
     @keyframes modalIn{from{opacity:0;transform:translateY(12px) scale(0.98);}to{opacity:1;transform:translateY(0) scale(1);}}
     @keyframes modalOut{from{opacity:1;transform:translateY(0) scale(1);}to{opacity:0;transform:translateY(8px) scale(0.985);}}
+    @keyframes modalSoftFadeIn{from{opacity:0;filter:blur(6px);}to{opacity:1;filter:blur(0);}}
+    @keyframes modalLeftIn{from{opacity:0;transform:translateY(10px);filter:blur(10px);}to{opacity:1;transform:translateY(0);filter:blur(0);}}
     .modal-left{position:relative;background:linear-gradient(180deg,rgba(200,165,92,0.06),transparent 60%);min-height:0;display:flex;flex-direction:column;}
-    .modal-right{border-left:1px solid var(--border);padding:26px 26px 22px;overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable;-webkit-overflow-scrolling:touch;min-height:0;min-width:360px;}
+    .modal-right{border-left:1px solid var(--border);padding:26px 26px 22px;overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable;-webkit-overflow-scrolling:touch;scroll-behavior:smooth;min-height:0;min-width:360px;}
     .modal-topbar{position:absolute;top:14px;left:14px;right:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;z-index:2;}
     .modal-title{font-family:'Playfair Display',serif;font-weight:800;font-size:1.05rem;letter-spacing:-0.01em;color:var(--fg);}
     .modal-close{width:40px;height:40px;border-radius:12px;border:1px solid rgba(255,255,255,0.10);background:rgba(12,12,12,0.35);color:var(--fg);cursor:pointer;transition:transform 0.2s ease,border-color 0.2s ease;display:flex;align-items:center;justify-content:center;}
@@ -201,6 +208,9 @@
     .modal-body ul{margin:10px 0 10px 18px;color:var(--fg-muted);}
     .modal-body li{margin:4px 0;}
     body.modal-open{overflow:hidden;}
+
+    .article-block{opacity:0;filter:blur(6px);transform:translateY(0);transition:opacity 520ms ease-out,filter 520ms ease-out;}
+    .article-block.article-visible{opacity:1;filter:blur(0);}
     .lightbox-overlay{position:fixed;inset:0;z-index:400;background:rgba(0,0,0,0.88);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;padding:22px;}
     .lightbox-overlay.active{display:flex;}
     .lightbox-panel{width:min(1280px,100%);height:min(92vh,980px);border-radius:18px;border:1px solid rgba(255,255,255,0.08);background:rgba(12,12,12,0.55);box-shadow:0 40px 160px rgba(0,0,0,0.7);overflow:hidden;display:flex;flex-direction:column;}
@@ -466,7 +476,7 @@
           </div>
         </div>
         <div class="modal-meta" id="project-modal-tags"></div>
-        <div class="modal-body" id="project-modal-body"></div>
+        <div class="modal-body" id="project-modal-body"><div id="project-modal-body-inner"></div></div>
         <div class="modal-actions">
           <button class="btn-outline" id="project-modal-close-bottom" aria-label="Chiudi">Chiudi</button>
         </div>
@@ -957,11 +967,21 @@ Il progetto ha permesso di ottenere una rete **scalabile, sicura e performante**
       });
     });
 
-    /* ==============================================
-       RENDER PROGETTI
-       ============================================== */
+    (function() {
+      var SITE_VERSION = '7';
+      try {
+        var url = new URL(window.location.href);
+        if (!url.searchParams.get('v')) {
+          url.searchParams.set('v', SITE_VERSION);
+          window.location.replace(url.toString());
+        }
+      } catch (e) {}
+    })();
+
     var projectsGrid = document.getElementById('projects-grid');
+
     function renderProjects(filter) {
+      if (!projectsGrid) return;
       var list = projects.filter(function(p) { return !p.disabled; });
       var f = filter === 'tutti' ? list : list.filter(function(p) { return p.category === filter; });
       f.sort(function(a, b) {
@@ -1014,8 +1034,10 @@ Il progetto ha permesso di ottenere una rete **scalabile, sicura e performante**
     var modalTitle = document.getElementById('project-modal-title');
     var modalTags = document.getElementById('project-modal-tags');
     var modalBody = document.getElementById('project-modal-body');
+    var modalBodyInner = document.getElementById('project-modal-body-inner');
     var modalClose = document.getElementById('project-modal-close');
     var modalLeft = modalPanel ? modalPanel.querySelector('.modal-left') : null;
+    var modalRight = modalPanel ? modalPanel.querySelector('.modal-right') : null;
     var galleryImage = document.getElementById('gallery-image');
     var galleryStage = galleryImage ? galleryImage.parentElement : null;
     var galleryThumbs = document.getElementById('gallery-thumbs');
@@ -1349,7 +1371,33 @@ Il progetto ha permesso di ottenere una rete **scalabile, sicura e performante**
       var tmini = document.getElementById('project-modal-title-mini');
       if (tmini) tmini.textContent = project.title;
       modalTags.innerHTML = (project.tags || []).map(function(t) { return '<span class="tag">' + t + '</span>'; }).join('');
-      modalBody.innerHTML = renderArticle(project);
+      if (modalBodyInner) modalBodyInner.innerHTML = renderArticle(project);
+      else modalBody.innerHTML = renderArticle(project);
+
+      if (modalBodyInner) {
+        if (modalState._articleObs) { try { modalState._articleObs.disconnect(); } catch (e) {} modalState._articleObs = null; }
+        var blocks = Array.prototype.slice.call(modalBodyInner.children || []);
+        blocks.forEach(function(el) {
+          el.classList.add('article-block');
+          el.classList.remove('article-visible');
+        });
+        blocks.slice(0, 2).forEach(function(el) { el.classList.add('article-visible'); });
+
+        if (window.IntersectionObserver && modalRight) {
+          modalState._articleObs = new IntersectionObserver(function(entries) {
+            entries.forEach(function(en) {
+              if (en.isIntersecting) {
+                en.target.classList.add('article-visible');
+                if (modalState._articleObs) modalState._articleObs.unobserve(en.target);
+              }
+            });
+          }, { root: modalRight, threshold: 0.12, rootMargin: '0px 0px -10% 0px' });
+
+          blocks.slice(2).forEach(function(el) { modalState._articleObs.observe(el); });
+        } else {
+          blocks.forEach(function(el) { el.classList.add('article-visible'); });
+        }
+      }
 
       var g = Array.isArray(project && project.gallery) ? project.gallery : [];
       var hasGallery = g.length > 0;
@@ -1366,6 +1414,25 @@ Il progetto ha permesso di ottenere una rete **scalabile, sicura e performante**
       modal.classList.add('opening');
       modal.setAttribute('aria-hidden', 'false');
       document.body.classList.add('modal-open');
+
+      if (modalRight && typeof modalRight.scrollTop === 'number') {
+        modalRight._smoothTarget = modalRight.scrollTop;
+      }
+
+      if (modalPanel) {
+        modalPanel.classList.remove('cinematic');
+        modalPanel.classList.add('pre-cinematic');
+        if (modalBodyInner) { modalBodyInner.style.animation = 'none'; void modalBodyInner.offsetWidth; modalBodyInner.style.animation = ''; }
+        if (modalTags) { modalTags.style.animation = 'none'; void modalTags.offsetWidth; modalTags.style.animation = ''; }
+        if (modalLeft) { modalLeft.style.animation = 'none'; void modalLeft.offsetWidth; modalLeft.style.animation = ''; }
+        requestAnimationFrame(function() {
+          requestAnimationFrame(function() {
+            modalPanel.classList.remove('pre-cinematic');
+            modalPanel.classList.add('cinematic');
+          });
+        });
+      }
+
       setTimeout(function() { modal.classList.remove('opening'); modalClose.focus(); }, 280);
     }
 
@@ -1376,10 +1443,13 @@ Il progetto ha permesso di ottenere una rete **scalabile, sicura e performante**
       setTimeout(function() {
         modalState.open = false;
         modalState.project = null;
+        if (modalState._articleObs) { try { modalState._articleObs.disconnect(); } catch (e) {} modalState._articleObs = null; }
         modal.classList.remove('active');
         modal.classList.remove('closing');
         modal.setAttribute('aria-hidden', 'true');
         document.body.classList.remove('modal-open');
+        if (modalPanel) modalPanel.classList.remove('cinematic');
+        if (modalPanel) modalPanel.classList.remove('pre-cinematic');
         if (modalState.lastFocus && modalState.lastFocus.focus) modalState.lastFocus.focus();
       }, 190);
       return;
@@ -1395,6 +1465,84 @@ Il progetto ha permesso di ottenere una rete **scalabile, sicura e performante**
       if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
       else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
     }
+
+    (function enableModalSmoothWheel() {
+      if (!modalRight) return;
+      if (!window.matchMedia('(pointer: fine)').matches) return;
+      var raf = 0;
+      function step() {
+        raf = 0;
+        if (!modalState.open) return;
+        var cur = modalRight.scrollTop;
+        var target = typeof modalRight._smoothTarget === 'number' ? modalRight._smoothTarget : cur;
+        var delta = target - cur;
+        if (Math.abs(delta) < 0.5) { modalRight.scrollTop = target; return; }
+        modalRight.scrollTop = cur + delta * 0.045;
+        raf = requestAnimationFrame(step);
+      }
+      modalRight.addEventListener('wheel', function(e) {
+        if (!modalState.open) return;
+        if (e.ctrlKey) return;
+        e.preventDefault();
+        var curTarget = typeof modalRight._smoothTarget === 'number' ? modalRight._smoothTarget : modalRight.scrollTop;
+        var next = curTarget + (e.deltaY * 2.6);
+        var max = Math.max(0, modalRight.scrollHeight - modalRight.clientHeight);
+        modalRight._smoothTarget = Math.max(0, Math.min(max, next));
+        if (!raf) raf = requestAnimationFrame(step);
+      }, { passive: false });
+
+      modalRight.addEventListener('scroll', function() {
+        if (!modalState.open) return;
+        if (raf) return;
+        modalRight._smoothTarget = modalRight.scrollTop;
+      }, { passive: true });
+    })();
+
+    (function enableGlobalSmoothWheel() {
+      if (!window.matchMedia('(pointer: fine)').matches) return;
+      var target = window.scrollY || 0;
+      var raf = 0;
+      function clampTarget() {
+        var max = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+        target = Math.max(0, Math.min(max, target));
+      }
+      function step() {
+        raf = 0;
+        if (modalState && modalState.open) return;
+        clampTarget();
+        var cur = window.scrollY || 0;
+        var delta = target - cur;
+        if (Math.abs(delta) < 0.5) { window.scrollTo(0, target); return; }
+        window.scrollTo(0, cur + delta * 0.045);
+        raf = requestAnimationFrame(step);
+      }
+      window.addEventListener('wheel', function(e) {
+        if (modalState && modalState.open) return;
+        if (e.ctrlKey) return;
+        // If the wheel originates from a scrollable element, let it handle scrolling.
+        var el = e.target;
+        while (el && el !== document.body && el !== document.documentElement) {
+          var cs = window.getComputedStyle(el);
+          var canScroll = (cs.overflowY === 'auto' || cs.overflowY === 'scroll') && el.scrollHeight > el.clientHeight + 1;
+          if (canScroll) return;
+          el = el.parentElement;
+        }
+        e.preventDefault();
+        target += (e.deltaY * 2.6);
+        clampTarget();
+        if (!raf) raf = requestAnimationFrame(step);
+      }, { passive: false });
+
+      window.addEventListener('scroll', function() {
+        if (modalState && modalState.open) return;
+        if (raf) return;
+        target = window.scrollY || 0;
+      }, { passive: true });
+
+      window.addEventListener('resize', function() {
+        clampTarget();
+      });
+    })();
 
     modalClose.addEventListener('click', closeProjectModal);
     var modalCloseRight = document.getElementById('project-modal-close-right');
@@ -1822,8 +1970,7 @@ Il progetto ha permesso di ottenere una rete **scalabile, sicura e performante**
     /* ==============================================
        CURSORE (solo desktop)
        ============================================== */
-    if (window.matchMedia('(pointer: fine)').matches && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      document.body.classList.add('custom-cursor');
+    if (window.matchMedia('(pointer: fine)').matches) {
       var cursor = document.createElement('div');
       cursor.style.cssText = 'position:fixed;width:18px;height:18px;border-radius:50%;border:2px solid var(--accent);pointer-events:none;z-index:9999;transition:transform 0.15s ease,opacity 0.15s ease;transform:translate(-50%,-50%);mix-blend-mode:difference;opacity:0;';
       document.body.appendChild(cursor);
@@ -1831,7 +1978,12 @@ Il progetto ha permesso di ottenere una rete **scalabile, sicura e performante**
       dot.style.cssText = 'position:fixed;width:4px;height:4px;border-radius:50%;background:var(--accent);pointer-events:none;z-index:9999;transform:translate(-50%,-50%);opacity:0;transition:opacity 0.15s ease;';
       document.body.appendChild(dot);
       var mx = 0, my = 0, cx = 0, cy = 0;
-      document.addEventListener('mousemove', function(e) { mx = e.clientX; my = e.clientY; cursor.style.opacity = '1'; dot.style.opacity = '1'; });
+      document.addEventListener('mousemove', function(e) {
+        mx = e.clientX; my = e.clientY;
+        if (!document.body.classList.contains('custom-cursor')) document.body.classList.add('custom-cursor');
+        cursor.style.opacity = '1';
+        dot.style.opacity = '1';
+      });
       document.addEventListener('mouseleave', function() { cursor.style.opacity = '0'; dot.style.opacity = '0'; });
       document.querySelectorAll('a,button,.project-card,.tag').forEach(function(el) {
         el.addEventListener('mouseenter', function() { cursor.style.transform = 'translate(-50%,-50%) scale(2.2)'; cursor.style.borderColor = 'var(--fiber)'; });
