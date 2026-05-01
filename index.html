@@ -3,10 +3,32 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="refresh" content="0; url=Curriculum.html" />
   <title>CV — Redirect</title>
+  <style>
+    :root{color-scheme:dark;}
+    body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0b0b0b;color:rgba(240,236,228,0.88);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;}
+    .wrap{display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;padding:24px;}
+    .spinner{width:46px;height:46px;border-radius:999px;border:3px solid rgba(240,236,228,0.18);border-top-color:rgba(200,165,92,0.9);animation:spin 0.9s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    a{color:rgba(200,165,92,0.95);text-decoration:none;}
+    a:hover{text-decoration:underline;}
+  </style>
 </head>
 <body>
-  <p>Redirect… <a href="Curriculum.html">Apri Curriculum</a></p>
+  <div class="wrap" role="status" aria-live="polite">
+    <div class="spinner" aria-hidden="true"></div>
+    <div style="font-weight:700;letter-spacing:-0.01em;">Sto aprendo il Curriculum…</div>
+    <div style="font-size:0.92rem;opacity:0.78;">Se non si apre, clicca qui: <a href="Curriculum.html">Curriculum.html</a></div>
+  </div>
+
+  <script>
+    (function(){
+      var url = 'Curriculum.html';
+      try {
+        if (location.pathname && /\/Curriculum\.html$/i.test(location.pathname)) return;
+      } catch (e) {}
+      setTimeout(function(){ location.replace(url); }, 50);
+    })();
+  </script>
 </body>
 </html>
